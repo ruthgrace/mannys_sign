@@ -18,116 +18,83 @@ FASTLED_USING_NAMESPACE
 #define DATA_PIN    5
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
-#define NUM_LEDS    64
-CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS          96
-#define FRAMES_PER_SECOND  120
+//#define NUM_STRIPS 5
+//#define NUM_LEDS_PER_STRIP 300
+//#define NUM_LEDS__STRIP1 162
+#define NUM_LEDS__STRIP1 300
+CRGB leds1[NUM_LEDS__STRIP1];
+
+#define BRIGHTNESS          200
+#define FRAMES_PER_SECOND  20
+
+struct DigitRegion {
+  uint8_t start;
+  uint8_t end;
+};
+
+struct DigitDisplay {
+  struct DigitRegion top;
+  struct DigitRegion left;
+  struct DigitRegion right;
+  struct DigitRegion bottom;
+  struct DigitRegion center;
+};
+
+struct DigitDisplay digit1 = {
+  { 0, 8 },
+  { 40, 58 },
+  { 10, 28 },
+  { 28, 39 },
+  { 68, 78 }
+};
 
 void setup() {
   delay(3000); // 3 second delay for recovery
 
-  FastLED.addLeds<LED_TYPE, 1, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, 2, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, 3, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, 4, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, 5, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-//  FastLED.addLeds<LED_TYPE, 6, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-//  FastLED.addLeds<LED_TYPE, 7, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-//  FastLED.addLeds<LED_TYPE, 8, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  Serial.begin(9600);
+
+  FastLED.addLeds<LED_TYPE, 2, COLOR_ORDER>(leds1, NUM_LEDS__STRIP1).setCorrection(TypicalLEDStrip);
+//  FastLED.addLeds<LED_TYPE, 0, COLOR_ORDER>(leds[1], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+//  FastLED.addLeds<LED_TYPE, 4, COLOR_ORDER>(leds[2], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+//  FastLED.addLeds<LED_TYPE, 16, COLOR_ORDER>(leds[3], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+//  FastLED.addLeds<LED_TYPE, 17, COLOR_ORDER>(leds[4], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
 }
 
+void fill_region(struct DigitRegion &region, const CRGB &color) {
+  fill_solid(leds1 + region.start, region.end - region.start, color);
+}
 
-// List of patterns to cycle through.  Each is defined as a separate function below.
-typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
+void loop() {
+  static uint8_t region = 0;
+  fill_solid(leds1, NUM_LEDS__STRIP1, CRGB::Black);
 
-uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
-uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+  if (region == 0) {
+    fill_region(digit1.top, CRGB::Red);  
+  } else if (region == 1) {
+    fill_region(digit1.left, CRGB::Green);
+  } else if (region == 2) {
+    fill_region(digit1.right, CRGB::Blue);
+  } else if (region == 3) {
+    fill_region(digit1.bottom, CRGB::Yellow);
+  } else if (region == 4) {
+    fill_region(digit1.center, CRGB::Pink);
+  }
 
-void loop()
-{
-  // Call the current pattern function once, updating the 'leds' array
-  gPatterns[gCurrentPatternNumber]();
+//  fill_solid(leds1 + r.start, r.end - r.start, CRGB::Red);
 
   // send the 'leds' array out to the actual LED strip
   FastLED.show();
   // insert a delay to keep the framerate modest
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 
-  // do some periodic updates
-  EVERY_N_MILLISECONDS( 20 ) {
-    gHue++;  // slowly cycle the "base color" through the rainbow
-  }
-  EVERY_N_SECONDS( 10 ) {
-    nextPattern();  // change patterns periodically
-  }
-}
-
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
-
-void nextPattern()
-{
-  // add one to the current pattern number, and wrap around at the end
-  gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
-}
-
-void rainbow()
-{
-  // FastLED's built-in rainbow generator
-  fill_rainbow( leds, NUM_LEDS, gHue, 7);
-}
-
-void rainbowWithGlitter()
-{
-  // built-in FastLED rainbow, plus some random sparkly glitter
-  rainbow();
-  addGlitter(80);
-}
-
-void addGlitter( fract8 chanceOfGlitter)
-{
-  if ( random8() < chanceOfGlitter) {
-    leds[ random16(NUM_LEDS) ] += CRGB::White;
-  }
-}
-
-void confetti()
-{
-  // random colored speckles that blink in and fade smoothly
-  fadeToBlackBy( leds, NUM_LEDS, 10);
-  int pos = random16(NUM_LEDS);
-  leds[pos] += CHSV( gHue + random8(64), 200, 255);
-}
-
-void sinelon()
-{
-  // a colored dot sweeping back and forth, with fading trails
-  fadeToBlackBy( leds, NUM_LEDS, 20);
-  int pos = beatsin16( 13, 0, NUM_LEDS - 1 );
-  leds[pos] += CHSV( gHue, 255, 192);
-}
-
-void bpm()
-{
-  // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
-  uint8_t BeatsPerMinute = 62;
-  CRGBPalette16 palette = PartyColors_p;
-  uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
-  for ( int i = 0; i < NUM_LEDS; i++) { //9948
-    leds[i] = ColorFromPalette(palette, gHue + (i * 2), beat - gHue + (i * 10));
-  }
-}
-
-void juggle() {
-  // eight colored dots, weaving in and out of sync with each other
-  fadeToBlackBy( leds, NUM_LEDS, 20);
-  byte dothue = 0;
-  for ( int i = 0; i < 8; i++) {
-    leds[beatsin16( i + 7, 0, NUM_LEDS - 1 )] |= CHSV(dothue, 200, 255);
-    dothue += 32;
+  EVERY_N_SECONDS(3) {
+    region++;
+    if (region > 4) {
+      region = 0;
+    }
   }
 }
