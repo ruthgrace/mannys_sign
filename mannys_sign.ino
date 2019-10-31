@@ -26,6 +26,54 @@ CRGB ledsHours[NUM_LEDS__STRIP1];
 #define BRIGHTNESS          200
 #define FRAMES_PER_SECOND  20
 
+/* ESP32 specific stuff to avoid flickering?? */
+
+// -- The core to run FastLED.show()
+#define FASTLED_SHOW_CORE 0
+
+// -- Task handles for use in the notifications
+static TaskHandle_t FastLEDshowTaskHandle = 0;
+static TaskHandle_t userTaskHandle = 0;
+
+/** show() for ESP32
+    Call this function instead of FastLED.show(). It signals core 0 to issue a show,
+    then waits for a notification that it is done.
+*/
+void FastLEDshowESP32()
+{
+  if (userTaskHandle == 0) {
+    // -- Store the handle of the current task, so that the show task can
+    //    notify it when it's done
+    userTaskHandle = xTaskGetCurrentTaskHandle();
+
+    // -- Trigger the show task
+    xTaskNotifyGive(FastLEDshowTaskHandle);
+
+    // -- Wait to be notified that it's done
+    const TickType_t xMaxBlockTime = pdMS_TO_TICKS( 200 );
+    ulTaskNotifyTake(pdTRUE, xMaxBlockTime);
+    userTaskHandle = 0;
+  }
+}
+
+/** show Task
+    This function runs on core 0 and just waits for requests to call FastLED.show()
+*/
+void FastLEDshowTask(void *pvParameters)
+{
+  // -- Run forever...
+  for (;;) {
+    // -- Wait for the trigger
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+    // -- Do the show (synchronously)
+    FastLED.show();
+
+    // -- Notify the calling task
+    xTaskNotifyGive(userTaskHandle);
+  }
+}
+
 struct DigitRegion {
   uint8_t start;
   uint8_t end;
@@ -86,6 +134,13 @@ void setup() {
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
+
+  int core = xPortGetCoreID();
+  Serial.print("Main code running on core ");
+  Serial.println(core);
+
+  // -- Create the FastLED show task
+  xTaskCreatePinnedToCore(FastLEDshowTask, "FastLEDshowTask", 2048, NULL, 2, &FastLEDshowTaskHandle, FASTLED_SHOW_CORE);
 }
 
 //void drawA(struct DigitBoard &board) {
@@ -126,10 +181,10 @@ void loop() {
   static uint8_t nLeds = 79;
   //  Serial.println(nLeds);
 
-//  fill_solid(ledsHours + 79, nLeds - 79, CRGB::Red);
+  //  fill_solid(ledsHours + 79, nLeds - 79, CRGB::Red);
 
   // send the 'leds' array out to the actual LED strip
-  FastLED.show();
+  FastLEDshowESP32();
   // insert a delay to keep the framerate modest
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 
