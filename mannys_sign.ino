@@ -49,16 +49,24 @@ struct DigitDisplay digit1 = {
   { 68, 78 }
 };
 
+struct DigitDisplay digit2 = {
+  { 91, 105 },
+  { 106, 124 },
+  { 139, 161 },
+  { 125, 138 },
+  { 80, 89 }
+};
+
 void setup() {
   delay(3000); // 3 second delay for recovery
 
   Serial.begin(9600);
 
   FastLED.addLeds<LED_TYPE, 2, COLOR_ORDER>(leds1, NUM_LEDS__STRIP1).setCorrection(TypicalLEDStrip);
-//  FastLED.addLeds<LED_TYPE, 0, COLOR_ORDER>(leds[1], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-//  FastLED.addLeds<LED_TYPE, 4, COLOR_ORDER>(leds[2], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-//  FastLED.addLeds<LED_TYPE, 16, COLOR_ORDER>(leds[3], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-//  FastLED.addLeds<LED_TYPE, 17, COLOR_ORDER>(leds[4], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+  //  FastLED.addLeds<LED_TYPE, 0, COLOR_ORDER>(leds[1], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+  //  FastLED.addLeds<LED_TYPE, 4, COLOR_ORDER>(leds[2], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+  //  FastLED.addLeds<LED_TYPE, 16, COLOR_ORDER>(leds[3], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+  //  FastLED.addLeds<LED_TYPE, 17, COLOR_ORDER>(leds[4], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
@@ -73,28 +81,41 @@ void loop() {
   fill_solid(leds1, NUM_LEDS__STRIP1, CRGB::Black);
 
   if (region == 0) {
-    fill_region(digit1.top, CRGB::Red);  
+    fill_region(digit1.top, CRGB::Red);
+    fill_region(digit2.top, CRGB::Red);
   } else if (region == 1) {
     fill_region(digit1.left, CRGB::Green);
+    fill_region(digit2.left, CRGB::Green);
   } else if (region == 2) {
     fill_region(digit1.right, CRGB::Blue);
+    fill_region(digit2.right, CRGB::Blue);
   } else if (region == 3) {
     fill_region(digit1.bottom, CRGB::Yellow);
+    fill_region(digit2.bottom, CRGB::Yellow);
   } else if (region == 4) {
     fill_region(digit1.center, CRGB::Pink);
+    fill_region(digit2.center, CRGB::Pink);
   }
 
-//  fill_solid(leds1 + r.start, r.end - r.start, CRGB::Red);
+  static uint8_t nLeds = 79;
+  Serial.println(nLeds);
+
+  fill_solid(leds1 + 79, nLeds - 79, CRGB::Red);
 
   // send the 'leds' array out to the actual LED strip
   FastLED.show();
   // insert a delay to keep the framerate modest
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 
-  EVERY_N_SECONDS(3) {
+  EVERY_N_SECONDS(2) {
     region++;
     if (region > 4) {
       region = 0;
     }
+
+    //    nLeds++;
+    //    if (nLeds >= NUM_LEDS__STRIP1) {
+    //      nLeds = 79;
+    //    }
   }
 }
