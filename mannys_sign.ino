@@ -19,11 +19,8 @@ FASTLED_USING_NAMESPACE
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
-//#define NUM_STRIPS 5
-//#define NUM_LEDS_PER_STRIP 300
-//#define NUM_LEDS__STRIP1 162
 #define NUM_LEDS__STRIP1 300
-CRGB leds1[NUM_LEDS__STRIP1];
+CRGB ledsHours[NUM_LEDS__STRIP1];
 
 #define BRIGHTNESS          200
 #define FRAMES_PER_SECOND  20
@@ -35,26 +32,44 @@ struct DigitRegion {
 
 struct DigitDisplay {
   struct DigitRegion top;
-  struct DigitRegion left;
-  struct DigitRegion right;
+  struct DigitRegion leftTop;
+  struct DigitRegion leftBottom;
+  struct DigitRegion rightTop;
+  struct DigitRegion rightBottom;
   struct DigitRegion bottom;
   struct DigitRegion center;
 };
 
 struct DigitDisplay digit1 = {
   { 0, 8 },
-  { 40, 58 },
-  { 10, 28 },
+  { 48, 58 }, // left top
+  { 40, 49 }, // left bottom
+  { 10, 19 }, // right top
+  { 18, 29 }, // right bottom
   { 28, 39 },
   { 68, 78 }
 };
 
 struct DigitDisplay digit2 = {
   { 91, 105 },
-  { 106, 124 },
-  { 139, 161 },
+  { 106, 116 }, // left top
+  { 115, 124 }, // left bottom
+  { 151, 160 }, // right top
+  { 139, 152 }, // right bottom
   { 125, 138 },
   { 80, 89 }
+};
+
+struct DigitBoard {
+  struct DigitDisplay digit1;
+  struct DigitDisplay digit2;
+  CRGB *leds;
+};
+
+const struct DigitBoard hours = {
+  digit1,
+  digit2,
+  ledsHours
 };
 
 void setup() {
@@ -62,7 +77,7 @@ void setup() {
 
   Serial.begin(9600);
 
-  FastLED.addLeds<LED_TYPE, 2, COLOR_ORDER>(leds1, NUM_LEDS__STRIP1).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, 2, COLOR_ORDER>(ledsHours, NUM_LEDS__STRIP1).setCorrection(TypicalLEDStrip);
   //  FastLED.addLeds<LED_TYPE, 0, COLOR_ORDER>(leds[1], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
   //  FastLED.addLeds<LED_TYPE, 4, COLOR_ORDER>(leds[2], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
   //  FastLED.addLeds<LED_TYPE, 16, COLOR_ORDER>(leds[3], NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
@@ -72,35 +87,45 @@ void setup() {
   FastLED.setBrightness(BRIGHTNESS);
 }
 
+//void drawA(struct DigitBoard &board) {
+//  fill_region(
+//}
+
 void fill_region(struct DigitRegion &region, const CRGB &color) {
-  fill_solid(leds1 + region.start, region.end - region.start, color);
+  fill_solid(ledsHours + region.start, region.end - region.start, color);
 }
 
 void loop() {
-  static uint8_t region = 0;
-  fill_solid(leds1, NUM_LEDS__STRIP1, CRGB::Black);
+  static uint8_t region = 1;
+  fill_solid(ledsHours, NUM_LEDS__STRIP1, CRGB::Black);
 
   if (region == 0) {
     fill_region(digit1.top, CRGB::Red);
     fill_region(digit2.top, CRGB::Red);
   } else if (region == 1) {
-    fill_region(digit1.left, CRGB::Green);
-    fill_region(digit2.left, CRGB::Green);
+    fill_region(digit1.leftTop, CRGB::Orange);
+    fill_region(digit2.leftTop, CRGB::Orange);
   } else if (region == 2) {
-    fill_region(digit1.right, CRGB::Blue);
-    fill_region(digit2.right, CRGB::Blue);
+    fill_region(digit1.leftBottom, CRGB::Yellow);
+    fill_region(digit2.leftBottom, CRGB::Yellow);
   } else if (region == 3) {
-    fill_region(digit1.bottom, CRGB::Yellow);
-    fill_region(digit2.bottom, CRGB::Yellow);
+    fill_region(digit1.rightTop, CRGB::Green);
+    fill_region(digit2.rightTop, CRGB::Green);
   } else if (region == 4) {
-    fill_region(digit1.center, CRGB::Pink);
-    fill_region(digit2.center, CRGB::Pink);
+    fill_region(digit1.rightBottom, CRGB::Blue);
+    fill_region(digit2.rightBottom, CRGB::Blue);
+  } else if (region == 5) {
+    fill_region(digit1.bottom, CRGB::Indigo);
+    fill_region(digit2.bottom, CRGB::Indigo);
+  } else if (region == 6) {
+    fill_region(digit1.center, CRGB::Violet);
+    fill_region(digit2.center, CRGB::Violet);
   }
 
   static uint8_t nLeds = 79;
-  Serial.println(nLeds);
+  //  Serial.println(nLeds);
 
-  fill_solid(leds1 + 79, nLeds - 79, CRGB::Red);
+//  fill_solid(ledsHours + 79, nLeds - 79, CRGB::Red);
 
   // send the 'leds' array out to the actual LED strip
   FastLED.show();
@@ -110,7 +135,7 @@ void loop() {
   EVERY_N_SECONDS(2) {
     region++;
     if (region > 4) {
-      region = 0;
+      region = 1;
     }
 
     //    nLeds++;
