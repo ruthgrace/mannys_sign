@@ -1,6 +1,7 @@
 #include <FastLED.h>
 
 FASTLED_USING_NAMESPACE
+#define FASTLED_SHOW_CORE 0
 
 // FastLED "100-lines-of-code" demo reel, showing just a few
 // of the kinds of animation patterns you can quickly and easily
