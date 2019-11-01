@@ -190,6 +190,27 @@ void draw4(const struct DigitDisplay &disp) {
   paintRight(disp);
 }
 
+void draw5(const struct DigitDisplay &disp) {
+  paint_region(disp.leds, disp.layout.top);
+  paint_region(disp.leds, disp.layout.center);
+  paint_region(disp.leds, disp.layout.bottom);
+  paint_region(disp.leds, disp.layout.leftTop);
+  paint_region(disp.leds, disp.layout.rightBottom);
+}
+
+void draw6(const struct DigitDisplay &disp) {
+  paint_region(disp.leds, disp.layout.top);
+  paint_region(disp.leds, disp.layout.center);
+  paint_region(disp.leds, disp.layout.bottom);
+  paint_region(disp.leds, disp.layout.rightBottom);
+  paintLeft(disp);
+}
+
+void draw7(const struct DigitDisplay &disp) {
+  paint_region(disp.leds, disp.layout.top);
+  paintRight(disp);
+}
+
 void draw8(const struct DigitDisplay &disp) {
   paintRight(disp);
   paintLeft(disp);
@@ -207,9 +228,16 @@ void draw9(const struct DigitDisplay &disp) {
   paint_region(disp.leds, disp.layout.center);
 }
 
+void draw0(const struct DigitDisplay &disp) {
+  paintRight(disp);
+  paintLeft(disp);
+  paint_region(disp.leds, disp.layout.top);
+  paint_region(disp.leds, disp.layout.bottom);
+}
+
 void loop() {
-  draw3(hours1);
-  draw4(hours2);
+  draw7(hours1);
+  draw0(hours2);
 //  draw9(hours1);
 
   // send the 'leds' array out to the actual LED strip
