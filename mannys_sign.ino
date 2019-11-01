@@ -79,7 +79,7 @@ struct DigitRegion {
   uint8_t end;
 };
 
-struct DigitDisplay {
+struct DigitLayout {
   struct DigitRegion top;
   struct DigitRegion leftTop;
   struct DigitRegion leftBottom;
@@ -89,7 +89,7 @@ struct DigitDisplay {
   struct DigitRegion center;
 };
 
-struct DigitDisplay digit1 = {
+struct DigitLayout digit1 = {
   { 0, 8 },
   { 48, 58 }, // left top
   { 40, 49 }, // left bottom
@@ -99,7 +99,7 @@ struct DigitDisplay digit1 = {
   { 68, 78 }
 };
 
-struct DigitDisplay digit2 = {
+struct DigitLayout digit2 = {
   { 91, 105 },
   { 106, 116 }, // left top
   { 115, 124 }, // left bottom
@@ -109,14 +109,17 @@ struct DigitDisplay digit2 = {
   { 80, 89 }
 };
 
-struct DigitBoard {
-  struct DigitDisplay digit1;
-  struct DigitDisplay digit2;
+struct DigitDisplay {
+  struct DigitLayout layout;
   CRGB *leds;
 };
 
-const struct DigitBoard hours = {
+const struct DigitDisplay hours1 = {
   digit1,
+  ledsHours
+};
+
+const struct DigitDisplay hours2 = {
   digit2,
   ledsHours
 };
@@ -143,60 +146,74 @@ void setup() {
   xTaskCreatePinnedToCore(FastLEDshowTask, "FastLEDshowTask", 2048, NULL, 2, &FastLEDshowTaskHandle, FASTLED_SHOW_CORE);
 }
 
-//void drawA(struct DigitBoard &board) {
-//  fill_region(
-//}
-
 void fill_region(struct DigitRegion &region, const CRGB &color) {
   fill_solid(ledsHours + region.start, region.end - region.start, color);
 }
 
+void paint_region(struct CRGB *leds, const struct DigitRegion &region) {
+  fill_solid(leds + region.start, region.end - region.start, CRGB::Red);
+}
+
+void paintRight(const struct DigitDisplay &disp) {
+  paint_region(disp.leds, disp.layout.rightTop);
+  paint_region(disp.leds, disp.layout.rightBottom);
+}
+
+void paintLeft(const struct DigitDisplay &disp) {
+  paint_region(disp.leds, disp.layout.leftTop);
+  paint_region(disp.leds, disp.layout.leftBottom);
+}
+
+void draw1(const struct DigitDisplay &disp) {
+  paintRight(disp);
+}
+
+void draw2(const struct DigitDisplay &disp) {
+  paint_region(disp.leds, disp.layout.top);
+  paint_region(disp.leds, disp.layout.center);
+  paint_region(disp.leds, disp.layout.bottom);
+
+  paint_region(disp.leds, disp.layout.rightTop);
+  paint_region(disp.leds, disp.layout.leftBottom);
+}
+
+void draw3(const struct DigitDisplay &disp) {
+  paint_region(disp.leds, disp.layout.top);
+  paint_region(disp.leds, disp.layout.center);
+  paint_region(disp.leds, disp.layout.bottom);
+  paintRight(disp);
+}
+
+void draw4(const struct DigitDisplay &disp) {
+  paint_region(disp.leds, disp.layout.center);
+  paint_region(disp.leds, disp.layout.leftTop);
+  paintRight(disp);
+}
+
+void draw8(const struct DigitDisplay &disp) {
+  paintRight(disp);
+  paintLeft(disp);
+
+  paint_region(disp.leds, disp.layout.top);
+  paint_region(disp.leds, disp.layout.center);
+  paint_region(disp.leds, disp.layout.bottom);
+}
+
+void draw9(const struct DigitDisplay &disp) {
+  paintRight(disp);
+
+  paint_region(disp.leds, disp.layout.leftTop);
+  paint_region(disp.leds, disp.layout.top);
+  paint_region(disp.leds, disp.layout.center);
+}
+
 void loop() {
-  static uint8_t region = 1;
-  fill_solid(ledsHours, NUM_LEDS__STRIP1, CRGB::Black);
-
-  if (region == 0) {
-    fill_region(digit1.top, CRGB::Red);
-    fill_region(digit2.top, CRGB::Red);
-  } else if (region == 1) {
-    fill_region(digit1.leftTop, CRGB::Orange);
-    fill_region(digit2.leftTop, CRGB::Orange);
-  } else if (region == 2) {
-    fill_region(digit1.leftBottom, CRGB::Yellow);
-    fill_region(digit2.leftBottom, CRGB::Yellow);
-  } else if (region == 3) {
-    fill_region(digit1.rightTop, CRGB::Green);
-    fill_region(digit2.rightTop, CRGB::Green);
-  } else if (region == 4) {
-    fill_region(digit1.rightBottom, CRGB::Blue);
-    fill_region(digit2.rightBottom, CRGB::Blue);
-  } else if (region == 5) {
-    fill_region(digit1.bottom, CRGB::Indigo);
-    fill_region(digit2.bottom, CRGB::Indigo);
-  } else if (region == 6) {
-    fill_region(digit1.center, CRGB::Violet);
-    fill_region(digit2.center, CRGB::Violet);
-  }
-
-  static uint8_t nLeds = 79;
-  //  Serial.println(nLeds);
-
-  //  fill_solid(ledsHours + 79, nLeds - 79, CRGB::Red);
+  draw3(hours1);
+  draw4(hours2);
+//  draw9(hours1);
 
   // send the 'leds' array out to the actual LED strip
   FastLEDshowESP32();
   // insert a delay to keep the framerate modest
   FastLED.delay(1000 / FRAMES_PER_SECOND);
-
-  EVERY_N_SECONDS(2) {
-    region++;
-    if (region > 4) {
-      region = 1;
-    }
-
-    //    nLeds++;
-    //    if (nLeds >= NUM_LEDS__STRIP1) {
-    //      nLeds = 79;
-    //    }
-  }
 }
