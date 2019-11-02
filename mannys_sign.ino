@@ -19,22 +19,28 @@ FASTLED_USING_NAMESPACE
 #warning "Requires FastLED 3.1 or later; check github for latest code."
 #endif
 
-#define DATA_PIN__S4    2
-#define DATA_PIN__S6    4
-#define DATA_PIN__S9    17
+#define DATA_PIN__S2 19
+#define DATA_PIN__S4 2
+#define DATA_PIN__S6 4
+#define DATA_PIN__S9 17
+#define DATA_PIN__S8 16
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
-#define NUM_LEDS__STRIP1 300
-#define NUM_LEDS__STRIP2 300
-#define NUM_LEDS__STRIP3 300
+#define NUM_LEDS__S2 200
+#define NUM_LEDS__S4 200
+#define NUM_LEDS__S6 200
+#define NUM_LEDS__S9 30
+#define NUM_LEDS__S8 200
 
-CRGB ledsHours[NUM_LEDS__STRIP1];
-CRGB ledsMinutes[NUM_LEDS__STRIP2];
-CRGB ledsMinsLabel[NUM_LEDS__STRIP3];
+CRGB ledsDays[NUM_LEDS__S2];
+CRGB ledsHours[NUM_LEDS__S4];
+CRGB ledsMinutes[NUM_LEDS__S6];
+CRGB ledsSeconds[NUM_LEDS__S8];
+CRGB ledsMinsLabel[NUM_LEDS__S9];
 
 #define BRIGHTNESS         64
-#define FRAMES_PER_SECOND  1
+#define FRAMES_PER_SECOND  20
 
 /* ESP32 specific stuff to avoid flickering?? */
 
@@ -99,6 +105,26 @@ struct DigitLayout {
   struct DigitRegion center;
 };
 
+struct DigitLayout daysDigit1 = {
+  { 0, 8 },
+  { 48, 58 }, // left top
+  { 40, 49 }, // left bottom
+  { 10, 19 }, // right top
+  { 18, 29 }, // right bottom
+  { 28, 39 },
+  { 68, 78 }
+};
+
+struct DigitLayout daysDigit2 = {
+  { 91, 105 },
+  { 106, 116 }, // left top
+  { 115, 124 }, // left bottom
+  { 151, 160 }, // right top
+  { 139, 152 }, // right bottom
+  { 125, 138 },
+  { 80, 89 }
+};
+
 struct DigitLayout hoursDigit1 = {
   { 0, 8 },
   { 48, 58 }, // left top
@@ -139,9 +165,39 @@ struct DigitLayout minsDigit2 = {
   { 80, 89 }
 };
 
+struct DigitLayout secsDigit1 = {
+  { 0, 8 },
+  { 48, 58 }, // left top
+  { 40, 49 }, // left bottom
+  { 10, 19 }, // right top
+  { 18, 29 }, // right bottom
+  { 28, 39 },
+  { 68, 78 }
+};
+
+struct DigitLayout secsDigit2 = {
+  { 91, 105 },
+  { 106, 116 }, // left top
+  { 115, 124 }, // left bottom
+  { 151, 160 }, // right top
+  { 139, 152 }, // right bottom
+  { 125, 138 },
+  { 80, 89 }
+};
+
 struct DigitDisplay {
   struct DigitLayout layout;
   CRGB *leds;
+};
+
+const struct DigitDisplay days1 = {
+  daysDigit1,
+  ledsDays
+};
+
+const struct DigitDisplay days2 = {
+  daysDigit2,
+  ledsDays
 };
 
 const struct DigitDisplay hours1 = {
@@ -154,7 +210,6 @@ const struct DigitDisplay hours2 = {
   ledsHours
 };
 
-
 const struct DigitDisplay mins1 = {
   minsDigit1,
   ledsMinutes
@@ -163,6 +218,16 @@ const struct DigitDisplay mins1 = {
 const struct DigitDisplay mins2 = {
   minsDigit2,
   ledsMinutes
+};
+
+const struct DigitDisplay secs1 = {
+  secsDigit1,
+  ledsSeconds
+};
+
+const struct DigitDisplay secs2 = {
+  secsDigit2,
+  ledsSeconds
 };
 
 //#include "RTCZero.h"
@@ -225,9 +290,11 @@ void setup() {
 
   setupRtc();
 
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S4, COLOR_ORDER>(ledsHours, NUM_LEDS__STRIP1).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S6, COLOR_ORDER>(ledsMinutes, NUM_LEDS__STRIP2).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__STRIP3).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S2, COLOR_ORDER>(ledsDays, NUM_LEDS__S2).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S4, COLOR_ORDER>(ledsHours, NUM_LEDS__S4).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S6, COLOR_ORDER>(ledsMinutes, NUM_LEDS__S6).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S8, COLOR_ORDER>(ledsSeconds, NUM_LEDS__S8).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__S9).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
@@ -384,15 +451,20 @@ void loop() {
   drawDigit(hours2, seconds % 10);
   drawDigit(mins1, seconds / 10);
   drawDigit(mins2, seconds % 10);
+  drawDigit(secs1, seconds / 10);
+  drawDigit(secs2, seconds % 10);
+  drawDigit(days1, seconds / 10);
+  drawDigit(days2, seconds % 10);
 
-  fill_solid(ledsMinsLabel, NUM_LEDS__STRIP3, CRGB::Blue);
+  fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
 
-  //  fill_solid(ledsMinutes, NUM_LEDS__STRIP2, CRGB::Blue);
+  //  fill_solid(ledsMinutes, NUM_LEDS__S6, CRGB::Blue);
 
   // send the 'leds' array out to the actual LED strip
   FastLEDshowESP32();
   // insert a delay to keep the framerate modest
-  FastLED.delay(1000 / FRAMES_PER_SECOND);
+//  FastLED.delay(1000 / FRAMES_PER_SECOND);
+  FastLED.delay(2000);
 
   EVERY_N_MILLISECONDS(20) {
     gHue++;
