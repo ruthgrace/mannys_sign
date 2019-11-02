@@ -19,8 +19,8 @@ FASTLED_USING_NAMESPACE
 #warning "Requires FastLED 3.1 or later; check github for latest code."
 #endif
 
-#define DATA_PIN__S2 19 // 
-#define DATA_PIN__S3 21 // GPIO21
+#define DATA_PIN__S2 19
+#define DATA_PIN__S3 14 // GPIO21
 #define DATA_PIN__S4 2  // S4, hours digits, GPIO2 / ADC12 / TOUCH2
 #define DATA_PIN__S5 22 // S5, hours label, GPIO22
 #define DATA_PIN__S6 4  // S6, mins digits, GPIO4 / ADC12 / TOUCH0
@@ -486,8 +486,6 @@ void loop() {
   FastLEDshowESP32();
   // insert a delay to keep the framerate modest
   FastLED.delay(1000 / FRAMES_PER_SECOND);
-
-  Serial.println("loop");
 
   EVERY_N_MILLISECONDS(20) {
     gHue++;
