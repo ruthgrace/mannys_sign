@@ -19,10 +19,13 @@ FASTLED_USING_NAMESPACE
 #warning "Requires FastLED 3.1 or later; check github for latest code."
 #endif
 
-#define DATA_PIN__S2 19
-#define DATA_PIN__S4 2
-#define DATA_PIN__S6 4
-#define DATA_PIN__S9 17
+#define DATA_PIN__S2 19 // 
+#define DATA_PIN__S3 21 // GPIO21
+#define DATA_PIN__S4 2  // S4, hours digits, GPIO2 / ADC12 / TOUCH2
+#define DATA_PIN__S5 22 // S5, hours label, GPIO22
+#define DATA_PIN__S6 4  // S6, mins digits, GPIO4 / ADC12 / TOUCH0
+#define DATA_PIN__S9 17 // GPIO17
+#define DATA_PIN__S7 0 // S7, mins label, GPIO18 / VSPI SCK
 #define DATA_PIN__S8 16
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
@@ -30,17 +33,23 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS__S2 200
 #define NUM_LEDS__S4 200
 #define NUM_LEDS__S6 200
-#define NUM_LEDS__S9 30
+#define NUM_LEDS__S9 5
+#define NUM_LEDS__S7 50
+#define NUM_LEDS__S5 50
+#define NUM_LEDS__S3 50
 #define NUM_LEDS__S8 200
 
 CRGB ledsDays[NUM_LEDS__S2];
 CRGB ledsHours[NUM_LEDS__S4];
 CRGB ledsMinutes[NUM_LEDS__S6];
 CRGB ledsSeconds[NUM_LEDS__S8];
-CRGB ledsMinsLabel[NUM_LEDS__S9];
+CRGB ledsMinsLabel[NUM_LEDS__S7];
+CRGB ledsHoursLabel[NUM_LEDS__S5];
+CRGB ledsDaysLabel[NUM_LEDS__S3];
+CRGB ledsSecsLabel[NUM_LEDS__S9];
 
 #define BRIGHTNESS         64
-#define FRAMES_PER_SECOND  20
+#define FRAMES_PER_SECOND  60
 
 /* ESP32 specific stuff to avoid flickering?? */
 
@@ -274,7 +283,7 @@ void setupRtc() {
   time(&now);
   Serial.println(now);
 
-//  setTime(hours,minutes,seconds,days,months,tyear);
+  //  setTime(hours,minutes,seconds,days,months,tyear);
 
   Serial.print("after ");
   time(&now);
@@ -290,11 +299,23 @@ void setup() {
 
   setupRtc();
 
+  pinMode(DATA_PIN__S2, OUTPUT);
+  pinMode(DATA_PIN__S3, OUTPUT);
+  pinMode(DATA_PIN__S4, OUTPUT);
+  pinMode(DATA_PIN__S5, OUTPUT);
+  pinMode(DATA_PIN__S6, OUTPUT);
+  pinMode(DATA_PIN__S9, OUTPUT);
+  pinMode(DATA_PIN__S7, OUTPUT);
+  pinMode(DATA_PIN__S8, OUTPUT);
+
   FastLED.addLeds<LED_TYPE, DATA_PIN__S2, COLOR_ORDER>(ledsDays, NUM_LEDS__S2).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S4, COLOR_ORDER>(ledsHours, NUM_LEDS__S4).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S6, COLOR_ORDER>(ledsMinutes, NUM_LEDS__S6).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S8, COLOR_ORDER>(ledsSeconds, NUM_LEDS__S8).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S7, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__S7).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S5, COLOR_ORDER>(ledsHoursLabel, NUM_LEDS__S5).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__S9).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S3, COLOR_ORDER>(ledsDaysLabel, NUM_LEDS__S3).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
@@ -457,14 +478,16 @@ void loop() {
   drawDigit(days2, seconds % 10);
 
   fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
-
-  //  fill_solid(ledsMinutes, NUM_LEDS__S6, CRGB::Blue);
+  fill_solid(ledsSecsLabel, NUM_LEDS__S7, CRGB::Green);
+  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Red);
+  fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Red);
 
   // send the 'leds' array out to the actual LED strip
   FastLEDshowESP32();
   // insert a delay to keep the framerate modest
-//  FastLED.delay(1000 / FRAMES_PER_SECOND);
-  FastLED.delay(2000);
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+
+  Serial.println("loop");
 
   EVERY_N_MILLISECONDS(20) {
     gHue++;
