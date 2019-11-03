@@ -36,6 +36,7 @@ const int   daylightOffset_sec = 3600;
 #define DATA_PIN__S9 17 // GPIO17
 #define DATA_PIN__S7 0 // S7, mins label, GPIO18 / VSPI SCK
 #define DATA_PIN__S8 16
+#define DATA_PIN__S1 5
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
@@ -50,6 +51,7 @@ const int   daylightOffset_sec = 3600;
 #define NUM_LEDS__S7 50
 #define NUM_LEDS__S5 50
 #define NUM_LEDS__S3 50
+#define NUM_LEDS__S1 300
 
 CRGB ledsDays[NUM_LEDS__S2];
 CRGB ledsHours[NUM_LEDS__S4]; // Need to calibrate
@@ -59,6 +61,7 @@ CRGB ledsMinsLabel[NUM_LEDS__S7];
 CRGB ledsHoursLabel[NUM_LEDS__S5];
 CRGB ledsDaysLabel[NUM_LEDS__S3];
 CRGB ledsSecsLabel[NUM_LEDS__S9];
+CRGB ledsTitle[NUM_LEDS__S1];
 
 #define BRIGHTNESS         64
 #define FRAMES_PER_SECOND  60
@@ -386,6 +389,7 @@ void setup() {
   FastLED.addLeds<LED_TYPE, DATA_PIN__S5, COLOR_ORDER>(ledsHoursLabel, NUM_LEDS__S5).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__S9).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S3, COLOR_ORDER>(ledsDaysLabel, NUM_LEDS__S3).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S1, COLOR_ORDER>(ledsTitle, NUM_LEDS__S1).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
@@ -645,7 +649,7 @@ void visualize_regions(const struct DigitDisplay &disp) {
 }
 
 void fill_label(struct CRGB *labelLeds) {
-  fill_solid(labelLeds, NUM_LEDS__LABEL, CRGB::Red);
+  fill_solid(labelLeds, NUM_LEDS__LABEL, CRGB::Blue);
 }
 
 static struct DigitDisplay visualized = mins2;
@@ -721,6 +725,8 @@ void loop() {
   fill_label(ledsSecsLabel);
   fill_label(ledsHoursLabel);
   fill_label(ledsDaysLabel);
+
+  fill_solid(ledsTitle, NUM_LEDS__S1, CRGB::Blue);
   //  fill_solid(ledsMinsLabel, NUM_LEDS__S7, CRGB::DeepPink);
   //  fill_solid(ledsSecsLabel, NUM_LEDS__S9, CRGB::Green);
   //  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Gold);
