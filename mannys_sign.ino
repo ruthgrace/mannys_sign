@@ -5,6 +5,15 @@ FASTLED_USING_NAMESPACE
 #include <time.h>
 #include <sys/time.h>
 
+#include <WiFi.h>
+#include "time.h"
+
+const char* ssid       = "Noisebridge";
+const char* password   = "";
+
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = -28800;
+const int   daylightOffset_sec = 3600;
 
 // FastLED "100-lines-of-code" demo reel, showing just a few
 // of the kinds of animation patterns you can quickly and easily
@@ -326,12 +335,39 @@ void setupRtc() {
   //  rtc.setDate(days, months, years);
 }
 
+void setupWifi() {
+  Serial.printf("Connecting to %s ", ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("Connection Failed! Rebooting...");
+    delay(5000);
+    ESP.restart();
+  }
+  Serial.println(" CONNECTED");
+}
+
+void printLocalTime()
+{
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+}
+
 void setup() {
   delay(3000); // 3 second delay for recovery
 
   Serial.begin(9600);
 
-  setupRtc();
+  setupWifi();
+  //init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  printLocalTime();
+
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
 
   pinMode(DATA_PIN__S2, OUTPUT);
   pinMode(DATA_PIN__S3, OUTPUT);
@@ -614,26 +650,70 @@ void fill_label(struct CRGB *labelLeds) {
 
 static struct DigitDisplay visualized = mins2;
 
+// End date/time: 8pm Nov 3 2020
+
+struct tm election_date = {
+  0,
+  0,
+  20,
+  3,
+  10,
+  120,
+  2,
+  307,
+  0
+};
+
+uint16_t daysBetween(struct tm &date1, struct tm &date2) {
+  time_t x = mktime(&date1);
+  time_t y = mktime(&date2);
+  
+  return (uint16_t)difftime(y, x) / (60 * 60 * 24);
+}
+
 void loop() {
   FastLED.clear();
 
-  static struct timeval now;
-  gettimeofday(&now, NULL);
+  //  printLocalTime();
 
-  time_t seconds = now.tv_sec % 60;
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return;
+  }
 
-  drawDigit(days1, seconds % 10);
-  drawDigit(days2, seconds % 10);
-  drawDigit(days3, seconds % 10);
+  time_t seconds = timeinfo.tm_sec;
+
+//  uint16_t daysDiff = daysBetween(timeinfo, election_date);
+
+  time_t nowTime = mktime(&timeinfo);
+  time_t electionTime = mktime(&election_date);
+  
+  double diff = difftime(electionTime, nowTime);
+  double daysDiff = diff / (60 * 60 * 24);
+  
+  drawDigit(days1, (int)(daysDiff / 100));
+  drawDigit(days2, ((int)daysDiff % 100) / 10);
+  drawDigit(days3, (int)daysDiff % 10);
 
   drawDigit(hours1, seconds % 10);
   drawDigit(hours2, seconds % 10);
 
-  drawDigit(mins1, seconds % 10);
-  drawDigit(mins2, seconds % 10);
+  Serial.print("diff: ");
+  Serial.println(diff);
+  
+  uint8_t minsOnly = ((unsigned long)(diff) / 60) % 60;
 
-  drawDigit(secs1, seconds % 10);
-  drawDigit(secs2, seconds % 10);
+  Serial.print("mins only: ");
+  Serial.println(minsOnly);
+
+  drawDigit(mins1, minsOnly / 10);
+  drawDigit(mins2, minsOnly % 10);
+
+  uint8_t secsOnly = (unsigned long)(diff) % 60;
+
+  drawDigit(secs1, secsOnly / 10);
+  drawDigit(secs2, secsOnly % 10);
 
   //
   //    fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
@@ -641,10 +721,10 @@ void loop() {
   fill_label(ledsSecsLabel);
   fill_label(ledsHoursLabel);
   fill_label(ledsDaysLabel);
-//  fill_solid(ledsMinsLabel, NUM_LEDS__S7, CRGB::DeepPink);
-//  fill_solid(ledsSecsLabel, NUM_LEDS__S9, CRGB::Green);
-//  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Gold);
-//  fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Purple);
+  //  fill_solid(ledsMinsLabel, NUM_LEDS__S7, CRGB::DeepPink);
+  //  fill_solid(ledsSecsLabel, NUM_LEDS__S9, CRGB::Green);
+  //  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Gold);
+  //  fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Purple);
 
   // send the 'leds' array out to the actual LED strip
   FastLEDshowESP32();
