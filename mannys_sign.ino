@@ -30,7 +30,7 @@ FASTLED_USING_NAMESPACE
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
-#define NUM_LEDS__S2 200
+#define NUM_LEDS__S2 300
 #define NUM_LEDS__S4 200
 #define NUM_LEDS__S6 200
 #define NUM_LEDS__S9 50
@@ -40,8 +40,8 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS__S8 200
 
 CRGB ledsDays[NUM_LEDS__S2];
-CRGB ledsHours[NUM_LEDS__S4];
-CRGB ledsMinutes[NUM_LEDS__S6];
+CRGB ledsHours[NUM_LEDS__S4]; // Need to calibrate
+CRGB ledsMinutes[NUM_LEDS__S6]; // Need to calibrate?
 CRGB ledsSeconds[NUM_LEDS__S8];
 CRGB ledsMinsLabel[NUM_LEDS__S7];
 CRGB ledsHoursLabel[NUM_LEDS__S5];
@@ -134,40 +134,34 @@ struct DigitLayout daysDigit2 = {
   { 79, 86 }
 };
 
-uint8_t gVisualizeRegions[] = { 5, 4, 3 };
-uint8_t gVisualizeRegionIndex = 0;
-uint8_t gVisualizeRegion = gVisualizeRegions[0];
-
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
-
 struct DigitLayout daysDigit3 = {
-  { 91, 105 },
-  { 106, 116 }, // left top
-  { 115, 124 }, // left bottom
-  { 151, 160 }, // right top
-  { 139, 152 }, // right bottom
-  { 125, 138 },
-  { 80, 89 }
+  { 156, 163 }, // top
+  { 204, 214 }, // left top
+  { 196, 206 }, // left bottom
+  { 166, 175 }, // right top
+  { 175, 184 }, // right bottom
+  { 186, 194 }, // bottom
+  { 223, 231 }  // center
 };
 
 struct DigitLayout hoursDigit1 = {
-  { 0, 8 },
+  { 0, 7 },   // top
   { 48, 58 }, // left top
   { 40, 49 }, // left bottom
-  { 10, 19 }, // right top
-  { 18, 29 }, // right bottom
-  { 28, 39 },
-  { 68, 78 }
+  { 10, 20 }, // right top
+  { 19, 28 }, // right bottom
+  { 30, 37 }, // bottom
+  { 68, 75 }  // center
 };
 
 struct DigitLayout hoursDigit2 = {
-  { 91, 105 },
+  { 96, 103 },  // top
   { 106, 116 }, // left top
   { 115, 124 }, // left bottom
-  { 151, 160 }, // right top
-  { 139, 152 }, // right bottom
-  { 125, 138 },
-  { 80, 89 }
+  { 146, 155 }, // right top
+  { 137, 147 }, // right bottom
+  { 127, 134 }, // bottom
+  { 80, 87 }    // center
 };
 
 struct DigitLayout minsDigit1 = {
@@ -189,6 +183,20 @@ struct DigitLayout minsDigit2 = {
   { 125, 138 },
   { 80, 89 }
 };
+
+// 0 = top
+// 1 = leftTop
+// 2 = leftBottom
+// 3 = rightTop
+// 4 = rightBottom
+// 5 = bottom
+// 6 = center
+
+uint8_t gVisualizeRegions[] = { 0, 3, 4, 5, 2, 1, 6 }; // top right bottom left
+uint8_t gVisualizeRegionIndex = 0;
+uint8_t gVisualizeRegion = gVisualizeRegions[0];
+
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 struct DigitLayout secsDigit1 = {
   { 0, 8 },
@@ -222,6 +230,11 @@ const struct DigitDisplay days1 = {
 
 const struct DigitDisplay days2 = {
   daysDigit2,
+  ledsDays
+};
+
+const struct DigitDisplay days3 = {
+  daysDigit3,
   ledsDays
 };
 
@@ -590,7 +603,7 @@ void visualize_regions(const struct DigitDisplay &disp) {
   }
 }
 
-static struct DigitDisplay visualized = days2;
+static struct DigitDisplay visualized = mins1;
 
 void loop() {
   FastLED.clear();
@@ -600,20 +613,23 @@ void loop() {
 
   time_t seconds = now.tv_sec % 60;
 
-  drawDigit(hours1, seconds / 10);
-  drawDigit(hours2, seconds % 10);
+//  drawDigit(hours1, seconds / 10);
+//  drawDigit(hours2, seconds % 10);
   drawDigit(mins1, seconds / 10);
   drawDigit(mins2, seconds % 10);
   drawDigit(secs1, seconds / 10);
   drawDigit(secs2, seconds % 10);
   //  drawDigit(days1, seconds / 10);
   //  drawDigit(days2, seconds % 10);
-  //  drawDigit(days1, 1);
-  //  drawDigit(days2, 2);
   //  paintLeft(days1);
 
-//  drawDigit(days1, seconds % 10);
-  visualize_regions(visualized);
+  drawDigit(days1, seconds % 10);
+  drawDigit(days2, seconds % 10);
+  drawDigit(days3, seconds % 10);
+
+  drawDigit(hours1, seconds % 10);
+  drawDigit(hours2, seconds % 10);
+//  visualize_regions(visualized);
 
   //
   //    fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
