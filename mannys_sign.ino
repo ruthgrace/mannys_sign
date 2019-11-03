@@ -64,7 +64,7 @@ CRGB ledsSecsLabel[NUM_LEDS__S9];
 CRGB ledsTitle[NUM_LEDS__S1];
 
 #define BRIGHTNESS         128
-#define FRAMES_PER_SECOND  60
+#define FRAMES_PER_SECOND  120
 
 /* ESP32 specific stuff to avoid flickering?? */
 
@@ -675,18 +675,23 @@ uint16_t daysBetween(struct tm &date1, struct tm &date2) {
   return (uint16_t)difftime(y, x) / (60 * 60 * 24);
 }
 
+int gLastSec = 0;
+
 void loop() {
   //  FastLED.clear();
-  fadeToBlackBy(ledsDays, NUM_LEDS__S2, 100);
-  fadeToBlackBy(ledsHours, NUM_LEDS__S4, 100);
-  fadeToBlackBy(ledsMinutes, NUM_LEDS__S6, 100);
-  fadeToBlackBy(ledsSeconds, NUM_LEDS__S8, 100);
-  fadeToBlackBy(ledsMinsLabel, NUM_LEDS__S7, 100);
-  fadeToBlackBy(ledsHoursLabel, NUM_LEDS__S5, 100);
-  fadeToBlackBy(ledsDaysLabel, NUM_LEDS__S3, 100);
-  fadeToBlackBy(ledsSecsLabel, NUM_LEDS__S9, 100);
-  fadeToBlackBy(ledsTitle, NUM_LEDS__S1, 100);
+  fadeToBlackBy(ledsSeconds, NUM_LEDS__S8, 20);
+//  fadeToBlackBy(ledsMinsLabel, NUM_LEDS__S7, 100);
+//  fadeToBlackBy(ledsHoursLabel, NUM_LEDS__S5, 100);
+//  fadeToBlackBy(ledsDaysLabel, NUM_LEDS__S3, 100);
+//  fadeToBlackBy(ledsSecsLabel, NUM_LEDS__S9, 100);
+//  fadeToBlackBy(ledsTitle, NUM_LEDS__S1, 100);
 
+  // When the minute is about to change, fade out all the other counters
+  if (gLastSec == 0) {
+    fadeToBlackBy(ledsDays, NUM_LEDS__S2, 20);
+    fadeToBlackBy(ledsHours, NUM_LEDS__S4, 20);
+    fadeToBlackBy(ledsMinutes, NUM_LEDS__S6, 20);
+  }
 
   //  printLocalTime();
 
@@ -695,6 +700,15 @@ void loop() {
     Serial.println("Failed to obtain time");
     return;
   }
+
+  if (gLastSec == timeinfo.tm_sec) {
+    FastLEDshowESP32();
+    // insert a delay to keep the framerate modest
+    FastLED.delay(1000 / FRAMES_PER_SECOND);
+    return;
+  }
+
+  gLastSec = timeinfo.tm_sec;
 
   time_t seconds = timeinfo.tm_sec;
 
@@ -739,6 +753,7 @@ void loop() {
   fill_label(ledsDaysLabel);
 
   fill_solid(ledsTitle, NUM_LEDS__S1, CRGB::Blue);
+//  fill_rainbow(ledsTitle, NUM_LEDS__S1, gHue);
   //  fill_solid(ledsMinsLabel, NUM_LEDS__S7, CRGB::DeepPink);
   //  fill_solid(ledsSecsLabel, NUM_LEDS__S9, CRGB::Green);
   //  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Gold);
@@ -749,7 +764,7 @@ void loop() {
   // insert a delay to keep the framerate modest
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 
-  EVERY_N_MILLISECONDS(20) {
+  EVERY_N_MILLISECONDS(2) {
     gHue++;
   }
 
