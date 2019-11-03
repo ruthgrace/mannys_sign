@@ -678,13 +678,7 @@ uint16_t daysBetween(struct tm &date1, struct tm &date2) {
 int gLastSec = 0;
 
 void loop() {
-  //  FastLED.clear();
   fadeToBlackBy(ledsSeconds, NUM_LEDS__S8, 20);
-//  fadeToBlackBy(ledsMinsLabel, NUM_LEDS__S7, 100);
-//  fadeToBlackBy(ledsHoursLabel, NUM_LEDS__S5, 100);
-//  fadeToBlackBy(ledsDaysLabel, NUM_LEDS__S3, 100);
-//  fadeToBlackBy(ledsSecsLabel, NUM_LEDS__S9, 100);
-//  fadeToBlackBy(ledsTitle, NUM_LEDS__S1, 100);
 
   // When the minute is about to change, fade out all the other counters
   if (gLastSec == 0) {
