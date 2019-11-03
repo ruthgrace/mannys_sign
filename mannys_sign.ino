@@ -15,28 +15,16 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -28800;
 const int   daylightOffset_sec = 3600;
 
-// FastLED "100-lines-of-code" demo reel, showing just a few
-// of the kinds of animation patterns you can quickly and easily
-// compose using FastLED.
-//
-// This example also shows one easy way to define multiple
-// animations patterns and have them automatically rotate.
-//
-// -Mark Kriegsman, December 2014
-
-#if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
-#warning "Requires FastLED 3.1 or later; check github for latest code."
-#endif
-
 #define DATA_PIN__S2 19
-#define DATA_PIN__S3 14 // GPIO21
-#define DATA_PIN__S4 2  // S4, hours digits, GPIO2 / ADC12 / TOUCH2
-#define DATA_PIN__S5 22 // S5, hours label, GPIO22
-#define DATA_PIN__S6 4  // S6, mins digits, GPIO4 / ADC12 / TOUCH0
-#define DATA_PIN__S9 17 // GPIO17
-#define DATA_PIN__S7 0 // S7, mins label, GPIO18 / VSPI SCK
+#define DATA_PIN__S3 14
+#define DATA_PIN__S4 2
+#define DATA_PIN__S5 22
+#define DATA_PIN__S6 4
+#define DATA_PIN__S9 17
+#define DATA_PIN__S7 0
 #define DATA_PIN__S8 16
 #define DATA_PIN__S1 5
+
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
@@ -54,8 +42,8 @@ const int   daylightOffset_sec = 3600;
 #define NUM_LEDS__S1 300
 
 CRGB ledsDays[NUM_LEDS__S2];
-CRGB ledsHours[NUM_LEDS__S4]; // Need to calibrate
-CRGB ledsMinutes[NUM_LEDS__S6]; // Need to calibrate?
+CRGB ledsHours[NUM_LEDS__S4];
+CRGB ledsMinutes[NUM_LEDS__S6];
 CRGB ledsSeconds[NUM_LEDS__S8];
 CRGB ledsMinsLabel[NUM_LEDS__S7];
 CRGB ledsHoursLabel[NUM_LEDS__S5];
@@ -63,7 +51,7 @@ CRGB ledsDaysLabel[NUM_LEDS__S3];
 CRGB ledsSecsLabel[NUM_LEDS__S9];
 CRGB ledsTitle[NUM_LEDS__S1];
 
-#define BRIGHTNESS         128
+#define BRIGHTNESS         192
 #define FRAMES_PER_SECOND  120
 
 /* ESP32 specific stuff to avoid flickering?? */
@@ -130,7 +118,7 @@ struct DigitLayout {
 };
 
 struct DigitLayout daysDigit1 = {
-  { 0, 8 },
+  { 0, 8 },   // top
   { 48, 58 }, // left top
   { 40, 49 }, // left bottom
   { 10, 19 }, // right top
@@ -140,13 +128,13 @@ struct DigitLayout daysDigit1 = {
 };
 
 struct DigitLayout daysDigit2 = {
-  { 95, 103 },
+  { 95, 103 },  // top
   { 105, 114 }, // left top
   { 113, 123 }, // left bottom
   { 143, 153 }, // right top
   { 135, 144 }, // right bottom
   { 125, 132 }, // bottom
-  { 79, 86 }
+  { 79, 86 }    // center
 };
 
 struct DigitLayout daysDigit3 = {
@@ -200,40 +188,24 @@ struct DigitLayout minsDigit2 = {
 };
 
 struct DigitLayout secsDigit1 = {
-  { 0, 8 },
+  { 0, 8 },   // top
   { 48, 58 }, // left top
   { 40, 49 }, // left bottom
   { 10, 19 }, // right top
   { 18, 29 }, // right bottom
-  { 28, 39 },
-  { 68, 78 }
+  { 28, 39 }, // bottom
+  { 68, 78 }  // center
 };
 
 struct DigitLayout secsDigit2 = {
-  { 91, 105 },
+  { 91, 105 },   // top
   { 106, 116 }, // left top
   { 115, 124 }, // left bottom
   { 151, 160 }, // right top
   { 139, 152 }, // right bottom
-  { 125, 138 },
-  { 80, 89 }
+  { 125, 138 }, // bottom
+  { 80, 89 }    // center
 };
-
-// 0 = top
-// 1 = leftTop
-// 2 = leftBottom
-// 3 = rightTop
-// 4 = rightBottom
-// 5 = bottom
-// 6 = center
-
-//uint8_t gVisualizeRegions[] = { 6, 0, 1, 2, 5, 4, 3 }; // center top left bottom right
-uint8_t gVisualizeRegions[] = { 5, 4, 3 }; // center top left bottom right
-//uint8_t gVisualizeRegions[] = { 0, 3, 4, 5, 2, 1, 6 }; // top right bottom left
-uint8_t gVisualizeRegionIndex = 0;
-uint8_t gVisualizeRegion = gVisualizeRegions[0];
-
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 struct DigitDisplay {
   struct DigitLayout layout;
@@ -285,59 +257,6 @@ const struct DigitDisplay secs2 = {
   ledsSeconds
 };
 
-//#include "RTCZero.h"
-//
-//RTCZero rtc;
-
-void setupRtc() {
-  //  rtc.begin();
-  byte seconds, minutes, hours;
-  byte days, months, years;
-  int thour, tminute, tsecond;
-  int tmonth, tday, tyear;
-  char s_month[5];
-  static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
-  sscanf(__DATE__, "%s %d %d", s_month, &tday, &tyear);
-  sscanf(__TIME__, "%d:%d:%d", &thour, &tminute, &tsecond);
-  tmonth = (strstr(month_names, s_month) - month_names) / 3;
-  years = tyear - 2000;
-  months =  tmonth + 1;
-  days = tday;
-  hours = thour;
-  minutes = tminute;
-  seconds = tsecond;
-
-  Serial.print("tmonth: ");
-  Serial.println(tmonth);
-  Serial.print("years: ");
-  Serial.println(years);
-  Serial.print("months: ");
-  Serial.println(months);
-  Serial.print("days: ");
-  Serial.println(days);
-  Serial.print("hours: ");
-  Serial.println(hours);
-  Serial.print("minutes: ");
-  Serial.println(minutes);
-  Serial.print("seconds: ");
-  Serial.println(seconds);
-  Serial.println("---");
-
-  Serial.print("before ");
-  time_t now;
-
-  time(&now);
-  Serial.println(now);
-
-  //  setTime(hours,minutes,seconds,days,months,tyear);
-
-  Serial.print("after ");
-  time(&now);
-  Serial.println(now);
-  //  rtc.setTime(hours, minutes, seconds);
-  //  rtc.setDate(days, months, years);
-}
-
 void setupWifi() {
   Serial.printf("Connecting to %s ", ssid);
   WiFi.begin(ssid, password);
@@ -349,14 +268,13 @@ void setupWifi() {
   Serial.println(" CONNECTED");
 }
 
-void printLocalTime()
-{
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) {
+void printLocalTime() {
+  struct tm now;
+  if (!getLocalTime(&now)) {
     Serial.println("Failed to obtain time");
     return;
   }
-  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  Serial.println(&now, "%A, %B %d %Y %H:%M:%S");
 }
 
 void setup() {
@@ -365,7 +283,7 @@ void setup() {
   Serial.begin(9600);
 
   setupWifi();
-  //init and get the time
+
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   printLocalTime();
 
@@ -381,26 +299,18 @@ void setup() {
   pinMode(DATA_PIN__S7, OUTPUT);
   pinMode(DATA_PIN__S8, OUTPUT);
 
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S2, COLOR_ORDER>(ledsDays, NUM_LEDS__S2).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S4, COLOR_ORDER>(ledsHours, NUM_LEDS__S4).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S6, COLOR_ORDER>(ledsMinutes, NUM_LEDS__S6).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S8, COLOR_ORDER>(ledsSeconds, NUM_LEDS__S8).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S7, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__S7).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S5, COLOR_ORDER>(ledsHoursLabel, NUM_LEDS__S5).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__S9).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S3, COLOR_ORDER>(ledsDaysLabel, NUM_LEDS__S3).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S1, COLOR_ORDER>(ledsTitle, NUM_LEDS__S1).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S2, COLOR_ORDER>(ledsDays, NUM_LEDS__S2).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S3, COLOR_ORDER>(ledsDaysLabel, NUM_LEDS__S3).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S4, COLOR_ORDER>(ledsHours, NUM_LEDS__S4).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S5, COLOR_ORDER>(ledsHoursLabel, NUM_LEDS__S5).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S6, COLOR_ORDER>(ledsMinutes, NUM_LEDS__S6).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S7, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__S7).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S8, COLOR_ORDER>(ledsSeconds, NUM_LEDS__S8).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__S9).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
-
-  int core = xPortGetCoreID();
-  Serial.print("Main code running on core ");
-  Serial.println(core);
-
-  Serial.print("Compiled at ");
-  Serial.print(__DATE__);
-  Serial.println(__TIME__);
 
   // -- Create the FastLED show task
   xTaskCreatePinnedToCore(FastLEDshowTask, "FastLEDshowTask", 2048, NULL, 2, &FastLEDshowTaskHandle, FASTLED_SHOW_CORE);
@@ -534,128 +444,12 @@ void drawDigit(const struct DigitDisplay &disp, time_t digit) {
 
 uint8_t gHue = 0;
 
-void visualize_region(struct CRGB *leds, const struct DigitRegion &region) {
-  struct CRGB *ledsRegion = leds + region.start;
-  uint16_t numLeds = region.end - region.start;
-
-  fill_solid(ledsRegion, numLeds, CRGB::Red);
-
-  ledsRegion[0] = CRGB::Blue;
-  ledsRegion[1] = CRGB::Green;
-
-  ledsRegion[numLeds - 1] = CRGB::Yellow;
-  ledsRegion[numLeds - 2] = CRGB::DeepPink;
-}
-
-void visualize_regions(const struct DigitDisplay &disp) {
-  if (gVisualizeRegion == 0) {
-    // top
-    const struct DigitRegion region = disp.layout.top;
-    // Serial.println("Visualizing top");
-    // Serial.print("Starts at ");
-    // Serial.print(region.start);
-    // Serial.println(" (blue)");
-    // Serial.print("End is ");
-    // Serial.print(region.end);
-    // Serial.println(" (yellow)");
-
-    visualize_region(disp.leds, region);
-    return;
-  }
-  if (gVisualizeRegion == 1) {
-    // leftTop
-    const struct DigitRegion region = disp.layout.leftTop;
-    // Serial.println("Visualizing leftTop");
-    // Serial.print("Starts at ");
-    // Serial.print(region.start);
-    // Serial.println(" (blue)");
-    // Serial.print("End is ");
-    // Serial.print(region.end);
-    // Serial.println(" (yellow)");
-
-    visualize_region(disp.leds, region);
-    return;
-  }
-  if (gVisualizeRegion == 2) {
-    // leftBottom
-    const struct DigitRegion region = disp.layout.leftBottom;
-    // Serial.println("Visualizing leftBottom");
-    // Serial.print("Starts at ");
-    // Serial.print(region.start);
-    // Serial.println(" (blue)");
-    // Serial.print("End is ");
-    // Serial.print(region.end);
-    // Serial.println(" (yellow)");
-
-    visualize_region(disp.leds, region);
-    return;
-  }
-  if (gVisualizeRegion == 3) {
-    // rightTop
-    const struct DigitRegion region = disp.layout.rightTop;
-    // Serial.println("Visualizing rightTop");
-    // Serial.print("Starts at ");
-    // Serial.print(region.start);
-    // Serial.println(" (blue)");
-    // Serial.print("End is ");
-    // Serial.print(region.end);
-    // Serial.println(" (yellow)");
-
-    visualize_region(disp.leds, region);
-    return;
-  }
-  if (gVisualizeRegion == 4) {
-    // rightBotto
-    const struct DigitRegion region = disp.layout.rightBottom;
-    // Serial.println("Visualizing rightBottom");
-    // Serial.print("Starts at ");
-    // Serial.print(region.start);
-    // Serial.println(" (blue)");
-    // Serial.print("End is ");
-    // Serial.print(region.end);
-    // Serial.println(" (yellow)");
-
-    visualize_region(disp.leds, region);
-    return;
-  }
-  if (gVisualizeRegion == 5) {
-    // bottom
-    const struct DigitRegion region = disp.layout.bottom;
-    // Serial.println("Visualizing bottom");
-    // Serial.print("Starts at ");
-    // Serial.print(region.start);
-    // Serial.println(" (blue)");
-    // Serial.print("End is ");
-    // Serial.print(region.end);
-    // Serial.println(" (yellow)");
-
-    visualize_region(disp.leds, region);
-    return;
-  }
-  if (gVisualizeRegion == 6) {
-    // center
-    const struct DigitRegion region = disp.layout.center;
-    // Serial.println("Visualizing center");
-    // Serial.print("Starts at ");
-    // Serial.print(region.start);
-    // Serial.println(" (blue)");
-    // Serial.print("End is ");
-    // Serial.print(region.end);
-    // Serial.println(" (yellow)");
-
-    visualize_region(disp.leds, region);
-    return;
-  }
-}
-
 void fill_label(struct CRGB *labelLeds) {
   fill_solid(labelLeds, NUM_LEDS__LABEL, CRGB::Blue);
 }
 
-static struct DigitDisplay visualized = mins2;
-
 // End date/time: 8pm Nov 3 2020
-
+// See: http://www.cplusplus.com/reference/ctime/tm/
 struct tm election_date = {
   0,
   0,
@@ -668,16 +462,10 @@ struct tm election_date = {
   0
 };
 
-uint16_t daysBetween(struct tm &date1, struct tm &date2) {
-  time_t x = mktime(&date1);
-  time_t y = mktime(&date2);
-
-  return (uint16_t)difftime(y, x) / (60 * 60 * 24);
-}
-
 int gLastSec = 0;
 
 void loop() {
+  // We always fade the seconds display since it is changing every second
   fadeToBlackBy(ledsSeconds, NUM_LEDS__S8, 20);
 
   // When the minute is about to change, fade out all the other counters
@@ -687,28 +475,24 @@ void loop() {
     fadeToBlackBy(ledsMinutes, NUM_LEDS__S6, 20);
   }
 
-  //  printLocalTime();
-
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) {
+  struct tm now;
+  if (!getLocalTime(&now)) {
     Serial.println("Failed to obtain time");
     return;
   }
 
-  if (gLastSec == timeinfo.tm_sec) {
+  if (gLastSec == now.tm_sec) {
     FastLEDshowESP32();
     // insert a delay to keep the framerate modest
     FastLED.delay(1000 / FRAMES_PER_SECOND);
     return;
   }
 
-  gLastSec = timeinfo.tm_sec;
+  gLastSec = now.tm_sec;
 
-  time_t seconds = timeinfo.tm_sec;
+  time_t seconds = now.tm_sec;
 
-  //  uint16_t daysDiff = daysBetween(timeinfo, election_date);
-
-  time_t nowTime = mktime(&timeinfo);
+  time_t nowTime = mktime(&now);
   time_t electionTime = mktime(&election_date);
 
   double diff = difftime(electionTime, nowTime);
@@ -723,13 +507,7 @@ void loop() {
   drawDigit(hours1, hoursOnly / 10);
   drawDigit(hours2, hoursOnly % 10);
 
-  Serial.print("diff: ");
-  Serial.println(diff);
-
   uint8_t minsOnly = ((unsigned long)(diff) / 60) % 60;
-
-  Serial.print("mins only: ");
-  Serial.println(minsOnly);
 
   drawDigit(mins1, minsOnly / 10);
   drawDigit(mins2, minsOnly % 10);
@@ -739,19 +517,12 @@ void loop() {
   drawDigit(secs1, secsOnly / 10);
   drawDigit(secs2, secsOnly % 10);
 
-  //
-  //    fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
   fill_label(ledsMinsLabel);
   fill_label(ledsSecsLabel);
   fill_label(ledsHoursLabel);
   fill_label(ledsDaysLabel);
 
   fill_solid(ledsTitle, NUM_LEDS__S1, CRGB::Blue);
-//  fill_rainbow(ledsTitle, NUM_LEDS__S1, gHue);
-  //  fill_solid(ledsMinsLabel, NUM_LEDS__S7, CRGB::DeepPink);
-  //  fill_solid(ledsSecsLabel, NUM_LEDS__S9, CRGB::Green);
-  //  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Gold);
-  //  fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Purple);
 
   // send the 'leds' array out to the actual LED strip
   FastLEDshowESP32();
@@ -760,97 +531,5 @@ void loop() {
 
   EVERY_N_MILLISECONDS(2) {
     gHue++;
-  }
-
-  EVERY_N_SECONDS(8) {
-    gVisualizeRegionIndex++;
-    if (gVisualizeRegionIndex >= ARRAY_SIZE(gVisualizeRegions)) gVisualizeRegionIndex = 0;
-    gVisualizeRegion = gVisualizeRegions[gVisualizeRegionIndex];
-
-
-    if (gVisualizeRegion == 0) {
-      // top
-      const struct DigitRegion region = visualized.layout.top;
-      Serial.println("---");
-      Serial.println("Visualizing top");
-      Serial.print("Starts at ");
-      Serial.print(region.start);
-      Serial.println(" (blue)");
-      Serial.print("End is ");
-      Serial.print(region.end);
-      Serial.println(" (yellow)");
-    }
-    if (gVisualizeRegion == 1) {
-      // leftTop
-      const struct DigitRegion region = visualized.layout.leftTop;
-      Serial.println("---");
-      Serial.println("Visualizing leftTop");
-      Serial.print("Starts at ");
-      Serial.print(region.start);
-      Serial.println(" (blue)");
-      Serial.print("End is ");
-      Serial.print(region.end);
-      Serial.println(" (yellow)");
-    }
-    if (gVisualizeRegion == 2) {
-      // leftBottom
-      const struct DigitRegion region = visualized.layout.leftBottom;
-      Serial.println("---");
-      Serial.println("Visualizing leftBottom");
-      Serial.print("Starts at ");
-      Serial.print(region.start);
-      Serial.println(" (blue)");
-      Serial.print("End is ");
-      Serial.print(region.end);
-      Serial.println(" (yellow)");
-    }
-    if (gVisualizeRegion == 3) {
-      // rightTop
-      const struct DigitRegion region = visualized.layout.rightTop;
-      Serial.println("---");
-      Serial.println("Visualizing rightTop");
-      Serial.print("Starts at ");
-      Serial.print(region.start);
-      Serial.println(" (blue)");
-      Serial.print("End is ");
-      Serial.print(region.end);
-      Serial.println(" (yellow)");
-    }
-    if (gVisualizeRegion == 4) {
-      // rightBotto
-      const struct DigitRegion region = visualized.layout.rightBottom;
-      Serial.println("---");
-      Serial.println("Visualizing rightBottom");
-      Serial.print("Starts at ");
-      Serial.print(region.start);
-      Serial.println(" (blue)");
-      Serial.print("End is ");
-      Serial.print(region.end);
-      Serial.println(" (yellow)");
-    }
-    if (gVisualizeRegion == 5) {
-      // bottom
-      const struct DigitRegion region = visualized.layout.bottom;
-      Serial.println("---");
-      Serial.println("Visualizing bottom");
-      Serial.print("Starts at ");
-      Serial.print(region.start);
-      Serial.println(" (blue)");
-      Serial.print("End is ");
-      Serial.print(region.end);
-      Serial.println(" (yellow)");
-    }
-    if (gVisualizeRegion == 6) {
-      // center
-      const struct DigitRegion region = visualized.layout.center;
-      Serial.println("---");
-      Serial.println("Visualizing center");
-      Serial.print("Starts at ");
-      Serial.print(region.start);
-      Serial.println(" (blue)");
-      Serial.print("End is ");
-      Serial.print(region.end);
-      Serial.println(" (yellow)");
-    }
   }
 }
