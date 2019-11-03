@@ -63,7 +63,7 @@ CRGB ledsDaysLabel[NUM_LEDS__S3];
 CRGB ledsSecsLabel[NUM_LEDS__S9];
 CRGB ledsTitle[NUM_LEDS__S1];
 
-#define BRIGHTNESS         64
+#define BRIGHTNESS         128
 #define FRAMES_PER_SECOND  60
 
 /* ESP32 specific stuff to avoid flickering?? */
@@ -664,19 +664,29 @@ struct tm election_date = {
   10,
   120,
   2,
-  307,
+  306,
   0
 };
 
 uint16_t daysBetween(struct tm &date1, struct tm &date2) {
   time_t x = mktime(&date1);
   time_t y = mktime(&date2);
-  
+
   return (uint16_t)difftime(y, x) / (60 * 60 * 24);
 }
 
 void loop() {
-  FastLED.clear();
+  //  FastLED.clear();
+  fadeToBlackBy(ledsDays, NUM_LEDS__S2, 100);
+  fadeToBlackBy(ledsHours, NUM_LEDS__S4, 100);
+  fadeToBlackBy(ledsMinutes, NUM_LEDS__S6, 100);
+  fadeToBlackBy(ledsSeconds, NUM_LEDS__S8, 100);
+  fadeToBlackBy(ledsMinsLabel, NUM_LEDS__S7, 100);
+  fadeToBlackBy(ledsHoursLabel, NUM_LEDS__S5, 100);
+  fadeToBlackBy(ledsDaysLabel, NUM_LEDS__S3, 100);
+  fadeToBlackBy(ledsSecsLabel, NUM_LEDS__S9, 100);
+  fadeToBlackBy(ledsTitle, NUM_LEDS__S1, 100);
+
 
   //  printLocalTime();
 
@@ -688,24 +698,26 @@ void loop() {
 
   time_t seconds = timeinfo.tm_sec;
 
-//  uint16_t daysDiff = daysBetween(timeinfo, election_date);
+  //  uint16_t daysDiff = daysBetween(timeinfo, election_date);
 
   time_t nowTime = mktime(&timeinfo);
   time_t electionTime = mktime(&election_date);
-  
-  double diff = difftime(electionTime, nowTime);
-  double daysDiff = diff / (60 * 60 * 24);
-  
-  drawDigit(days1, (int)(daysDiff / 100));
-  drawDigit(days2, ((int)daysDiff % 100) / 10);
-  drawDigit(days3, (int)daysDiff % 10);
 
-  drawDigit(hours1, seconds % 10);
-  drawDigit(hours2, seconds % 10);
+  double diff = difftime(electionTime, nowTime);
+  unsigned long daysDiff = (unsigned long)diff / 60 / 60 / 24;
+
+  drawDigit(days1, daysDiff / 100);
+  drawDigit(days2, daysDiff % 100 / 10);
+  drawDigit(days3, daysDiff % 100 % 10);
+
+  uint8_t hoursOnly = ((unsigned long)(diff) / 60 / 60) % 24;
+
+  drawDigit(hours1, hoursOnly / 10);
+  drawDigit(hours2, hoursOnly % 10);
 
   Serial.print("diff: ");
   Serial.println(diff);
-  
+
   uint8_t minsOnly = ((unsigned long)(diff) / 60) % 60;
 
   Serial.print("mins only: ");
