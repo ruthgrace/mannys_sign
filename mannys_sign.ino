@@ -33,7 +33,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS__S2 200
 #define NUM_LEDS__S4 200
 #define NUM_LEDS__S6 200
-#define NUM_LEDS__S9 5
+#define NUM_LEDS__S9 50
 #define NUM_LEDS__S7 50
 #define NUM_LEDS__S5 50
 #define NUM_LEDS__S3 50
@@ -119,20 +119,26 @@ struct DigitLayout daysDigit1 = {
   { 48, 58 }, // left top
   { 40, 49 }, // left bottom
   { 10, 19 }, // right top
-  { 18, 29 }, // right bottom
-  { 28, 39 },
-  { 68, 78 }
+  { 19, 28 }, // right bottom
+  { 30, 37 }, // bottom
+  { 68, 75 }  // center
 };
 
 struct DigitLayout daysDigit2 = {
-  { 91, 105 },
-  { 106, 116 }, // left top
-  { 115, 124 }, // left bottom
-  { 151, 160 }, // right top
-  { 139, 152 }, // right bottom
-  { 125, 138 },
-  { 80, 89 }
+  { 95, 103 },
+  { 105, 115 }, // left top
+  { 113, 123 }, // left bottom
+  { 151, 161 }, // right top
+  { 140, 152 }, // right bottom
+  { 127, 138 }, // center
+  { 79, 86 }
 };
+
+uint8_t gVisualizeRegions[] = { 0, 1, 2 };
+uint8_t gVisualizeRegionIndex = 0;
+uint8_t gVisualizeRegion = gVisualizeRegions[0];
+
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 struct DigitLayout daysDigit3 = {
   { 91, 105 },
@@ -483,6 +489,109 @@ void visualize_region(struct CRGB *leds, const struct DigitRegion &region) {
   ledsRegion[numLeds - 2] = CRGB::DeepPink;
 }
 
+void visualize_regions(const struct DigitDisplay &disp) {
+  if (gVisualizeRegion == 0) {
+    // top
+    const struct DigitRegion region = disp.layout.top;
+    // Serial.println("Visualizing top");
+    // Serial.print("Starts at ");
+    // Serial.print(region.start);
+    // Serial.println(" (blue)");
+    // Serial.print("End is ");
+    // Serial.print(region.end);
+    // Serial.println(" (yellow)");
+
+    visualize_region(disp.leds, region);
+    return;
+  }
+  if (gVisualizeRegion == 1) {
+    // leftTop
+    const struct DigitRegion region = disp.layout.leftTop;
+    // Serial.println("Visualizing leftTop");
+    // Serial.print("Starts at ");
+    // Serial.print(region.start);
+    // Serial.println(" (blue)");
+    // Serial.print("End is ");
+    // Serial.print(region.end);
+    // Serial.println(" (yellow)");
+
+    visualize_region(disp.leds, region);
+    return;
+  }
+  if (gVisualizeRegion == 2) {
+    // leftBottom
+    const struct DigitRegion region = disp.layout.leftBottom;
+    // Serial.println("Visualizing leftBottom");
+    // Serial.print("Starts at ");
+    // Serial.print(region.start);
+    // Serial.println(" (blue)");
+    // Serial.print("End is ");
+    // Serial.print(region.end);
+    // Serial.println(" (yellow)");
+
+    visualize_region(disp.leds, region);
+    return;
+  }
+  if (gVisualizeRegion == 3) {
+    // rightTop
+    const struct DigitRegion region = disp.layout.rightTop;
+    // Serial.println("Visualizing rightTop");
+    // Serial.print("Starts at ");
+    // Serial.print(region.start);
+    // Serial.println(" (blue)");
+    // Serial.print("End is ");
+    // Serial.print(region.end);
+    // Serial.println(" (yellow)");
+
+    visualize_region(disp.leds, region);
+    return;
+  }
+  if (gVisualizeRegion == 4) {
+    // rightBotto
+    const struct DigitRegion region = disp.layout.rightBottom;
+    // Serial.println("Visualizing rightBottom");
+    // Serial.print("Starts at ");
+    // Serial.print(region.start);
+    // Serial.println(" (blue)");
+    // Serial.print("End is ");
+    // Serial.print(region.end);
+    // Serial.println(" (yellow)");
+
+    visualize_region(disp.leds, region);
+    return;
+  }
+  if (gVisualizeRegion == 5) {
+    // bottom
+    const struct DigitRegion region = disp.layout.bottom;
+    // Serial.println("Visualizing bottom");
+    // Serial.print("Starts at ");
+    // Serial.print(region.start);
+    // Serial.println(" (blue)");
+    // Serial.print("End is ");
+    // Serial.print(region.end);
+    // Serial.println(" (yellow)");
+
+    visualize_region(disp.leds, region);
+    return;
+  }
+  if (gVisualizeRegion == 6) {
+    // center
+    const struct DigitRegion region = disp.layout.center;
+    // Serial.println("Visualizing center");
+    // Serial.print("Starts at ");
+    // Serial.print(region.start);
+    // Serial.println(" (blue)");
+    // Serial.print("End is ");
+    // Serial.print(region.end);
+    // Serial.println(" (yellow)");
+
+    visualize_region(disp.leds, region);
+    return;
+  }
+}
+
+static struct DigitDisplay visualized = days2;
+
 void loop() {
   FastLED.clear();
 
@@ -497,18 +606,20 @@ void loop() {
   drawDigit(mins2, seconds % 10);
   drawDigit(secs1, seconds / 10);
   drawDigit(secs2, seconds % 10);
-//  drawDigit(days1, seconds / 10);
-//  drawDigit(days2, seconds % 10);
-//  drawDigit(days1, 1);
-//  drawDigit(days2, 2);
-//  paintLeft(days1);
-  visualize_region(days1.leds, days1.layout.leftTop);
-  
-//
-//  fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
-//  fill_solid(ledsSecsLabel, NUM_LEDS__S7, CRGB::Green);
-//  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Red);
-//  fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Red);
+  //  drawDigit(days1, seconds / 10);
+  //  drawDigit(days2, seconds % 10);
+  //  drawDigit(days1, 1);
+  //  drawDigit(days2, 2);
+  //  paintLeft(days1);
+
+//  drawDigit(days1, seconds % 10);
+  visualize_regions(visualized);
+
+  //
+  //    fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
+  fill_solid(ledsSecsLabel, NUM_LEDS__S9, CRGB::Red);
+  //    fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Red);
+  //    fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Red);
 
   // send the 'leds' array out to the actual LED strip
   FastLEDshowESP32();
@@ -517,5 +628,97 @@ void loop() {
 
   EVERY_N_MILLISECONDS(20) {
     gHue++;
+  }
+
+  EVERY_N_SECONDS(8) {
+    gVisualizeRegionIndex++;
+    if (gVisualizeRegionIndex >= ARRAY_SIZE(gVisualizeRegions)) gVisualizeRegionIndex = 0;
+    gVisualizeRegion = gVisualizeRegions[gVisualizeRegionIndex];
+
+
+    if (gVisualizeRegion == 0) {
+      // top
+      const struct DigitRegion region = visualized.layout.top;
+      Serial.println("---");
+      Serial.println("Visualizing top");
+      Serial.print("Starts at ");
+      Serial.print(region.start);
+      Serial.println(" (blue)");
+      Serial.print("End is ");
+      Serial.print(region.end);
+      Serial.println(" (yellow)");
+    }
+    if (gVisualizeRegion == 1) {
+      // leftTop
+      const struct DigitRegion region = visualized.layout.leftTop;
+      Serial.println("---");
+      Serial.println("Visualizing leftTop");
+      Serial.print("Starts at ");
+      Serial.print(region.start);
+      Serial.println(" (blue)");
+      Serial.print("End is ");
+      Serial.print(region.end);
+      Serial.println(" (yellow)");
+    }
+    if (gVisualizeRegion == 2) {
+      // leftBottom
+      const struct DigitRegion region = visualized.layout.leftBottom;
+      Serial.println("---");
+      Serial.println("Visualizing leftBottom");
+      Serial.print("Starts at ");
+      Serial.print(region.start);
+      Serial.println(" (blue)");
+      Serial.print("End is ");
+      Serial.print(region.end);
+      Serial.println(" (yellow)");
+    }
+    if (gVisualizeRegion == 3) {
+      // rightTop
+      const struct DigitRegion region = visualized.layout.rightTop;
+      Serial.println("---");
+      Serial.println("Visualizing rightTop");
+      Serial.print("Starts at ");
+      Serial.print(region.start);
+      Serial.println(" (blue)");
+      Serial.print("End is ");
+      Serial.print(region.end);
+      Serial.println(" (yellow)");
+    }
+    if (gVisualizeRegion == 4) {
+      // rightBotto
+      const struct DigitRegion region = visualized.layout.rightBottom;
+      Serial.println("---");
+      Serial.println("Visualizing rightBottom");
+      Serial.print("Starts at ");
+      Serial.print(region.start);
+      Serial.println(" (blue)");
+      Serial.print("End is ");
+      Serial.print(region.end);
+      Serial.println(" (yellow)");
+    }
+    if (gVisualizeRegion == 5) {
+      // bottom
+      const struct DigitRegion region = visualized.layout.bottom;
+      Serial.println("---");
+      Serial.println("Visualizing bottom");
+      Serial.print("Starts at ");
+      Serial.print(region.start);
+      Serial.println(" (blue)");
+      Serial.print("End is ");
+      Serial.print(region.end);
+      Serial.println(" (yellow)");
+    }
+    if (gVisualizeRegion == 6) {
+      // center
+      const struct DigitRegion region = visualized.layout.center;
+      Serial.println("---");
+      Serial.println("Visualizing center");
+      Serial.print("Starts at ");
+      Serial.print(region.start);
+      Serial.println(" (blue)");
+      Serial.print("End is ");
+      Serial.print(region.end);
+      Serial.println(" (yellow)");
+    }
   }
 }
