@@ -165,38 +165,24 @@ struct DigitLayout hoursDigit2 = {
 };
 
 struct DigitLayout minsDigit1 = {
-  { 0, 8 },
-  { 48, 58 }, // left top
-  { 40, 49 }, // left bottom
+  { 0, 7 },   // top
+  { 49, 58 }, // left top
+  { 40, 50 }, // left bottom
   { 10, 19 }, // right top
-  { 18, 29 }, // right bottom
-  { 28, 39 },
-  { 68, 78 }
+  { 19, 28 }, // right bottom
+  { 30, 38 }, // bottom
+  { 68, 76 }  // center
 };
 
 struct DigitLayout minsDigit2 = {
-  { 91, 105 },
-  { 106, 116 }, // left top
-  { 115, 124 }, // left bottom
-  { 151, 160 }, // right top
-  { 139, 152 }, // right bottom
-  { 125, 138 },
-  { 80, 89 }
+  { 96, 104 },  // top
+  { 106, 115 }, // left top
+  { 115, 125 }, // left bottom
+  { 146, 155 }, // right top
+  { 137, 146 }, // right bottom
+  { 126, 134 }, // bottom
+  { 80, 87 }    // center
 };
-
-// 0 = top
-// 1 = leftTop
-// 2 = leftBottom
-// 3 = rightTop
-// 4 = rightBottom
-// 5 = bottom
-// 6 = center
-
-uint8_t gVisualizeRegions[] = { 0, 3, 4, 5, 2, 1, 6 }; // top right bottom left
-uint8_t gVisualizeRegionIndex = 0;
-uint8_t gVisualizeRegion = gVisualizeRegions[0];
-
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 struct DigitLayout secsDigit1 = {
   { 0, 8 },
@@ -217,6 +203,22 @@ struct DigitLayout secsDigit2 = {
   { 125, 138 },
   { 80, 89 }
 };
+
+// 0 = top
+// 1 = leftTop
+// 2 = leftBottom
+// 3 = rightTop
+// 4 = rightBottom
+// 5 = bottom
+// 6 = center
+
+//uint8_t gVisualizeRegions[] = { 6, 0, 1, 2, 5, 4, 3 }; // center top left bottom right
+uint8_t gVisualizeRegions[] = { 5, 4, 3 }; // center top left bottom right
+//uint8_t gVisualizeRegions[] = { 0, 3, 4, 5, 2, 1, 6 }; // top right bottom left
+uint8_t gVisualizeRegionIndex = 0;
+uint8_t gVisualizeRegion = gVisualizeRegions[0];
+
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 struct DigitDisplay {
   struct DigitLayout layout;
@@ -603,7 +605,7 @@ void visualize_regions(const struct DigitDisplay &disp) {
   }
 }
 
-static struct DigitDisplay visualized = mins1;
+static struct DigitDisplay visualized = mins2;
 
 void loop() {
   FastLED.clear();
@@ -615,8 +617,8 @@ void loop() {
 
 //  drawDigit(hours1, seconds / 10);
 //  drawDigit(hours2, seconds % 10);
-  drawDigit(mins1, seconds / 10);
-  drawDigit(mins2, seconds % 10);
+//  drawDigit(mins1, seconds / 10);
+//  drawDigit(mins2, seconds % 10);
   drawDigit(secs1, seconds / 10);
   drawDigit(secs2, seconds % 10);
   //  drawDigit(days1, seconds / 10);
@@ -629,6 +631,9 @@ void loop() {
 
   drawDigit(hours1, seconds % 10);
   drawDigit(hours2, seconds % 10);
+
+  drawDigit(mins1, seconds % 10);
+  drawDigit(mins2, seconds % 10);
 //  visualize_regions(visualized);
 
   //
