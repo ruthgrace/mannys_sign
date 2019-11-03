@@ -33,11 +33,14 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS__S2 300
 #define NUM_LEDS__S4 200
 #define NUM_LEDS__S6 200
+#define NUM_LEDS__S8 200
+
+#define NUM_LEDS__LABEL 50
+
 #define NUM_LEDS__S9 50
 #define NUM_LEDS__S7 50
 #define NUM_LEDS__S5 50
 #define NUM_LEDS__S3 50
-#define NUM_LEDS__S8 200
 
 CRGB ledsDays[NUM_LEDS__S2];
 CRGB ledsHours[NUM_LEDS__S4]; // Need to calibrate
@@ -343,9 +346,9 @@ void setup() {
   FastLED.addLeds<LED_TYPE, DATA_PIN__S4, COLOR_ORDER>(ledsHours, NUM_LEDS__S4).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S6, COLOR_ORDER>(ledsMinutes, NUM_LEDS__S6).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S8, COLOR_ORDER>(ledsSeconds, NUM_LEDS__S8).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S7, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__S7).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S7, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__S7).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S5, COLOR_ORDER>(ledsHoursLabel, NUM_LEDS__S5).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__S9).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__S9).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S3, COLOR_ORDER>(ledsDaysLabel, NUM_LEDS__S3).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
@@ -605,6 +608,10 @@ void visualize_regions(const struct DigitDisplay &disp) {
   }
 }
 
+void fill_label(struct CRGB *labelLeds) {
+  fill_solid(labelLeds, NUM_LEDS__LABEL, CRGB::Red);
+}
+
 static struct DigitDisplay visualized = mins2;
 
 void loop() {
@@ -615,16 +622,6 @@ void loop() {
 
   time_t seconds = now.tv_sec % 60;
 
-//  drawDigit(hours1, seconds / 10);
-//  drawDigit(hours2, seconds % 10);
-//  drawDigit(mins1, seconds / 10);
-//  drawDigit(mins2, seconds % 10);
-  drawDigit(secs1, seconds / 10);
-  drawDigit(secs2, seconds % 10);
-  //  drawDigit(days1, seconds / 10);
-  //  drawDigit(days2, seconds % 10);
-  //  paintLeft(days1);
-
   drawDigit(days1, seconds % 10);
   drawDigit(days2, seconds % 10);
   drawDigit(days3, seconds % 10);
@@ -634,13 +631,20 @@ void loop() {
 
   drawDigit(mins1, seconds % 10);
   drawDigit(mins2, seconds % 10);
-//  visualize_regions(visualized);
+
+  drawDigit(secs1, seconds % 10);
+  drawDigit(secs2, seconds % 10);
 
   //
   //    fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
-  fill_solid(ledsSecsLabel, NUM_LEDS__S9, CRGB::Red);
-  //    fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Red);
-  //    fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Red);
+  fill_label(ledsMinsLabel);
+  fill_label(ledsSecsLabel);
+  fill_label(ledsHoursLabel);
+  fill_label(ledsDaysLabel);
+//  fill_solid(ledsMinsLabel, NUM_LEDS__S7, CRGB::DeepPink);
+//  fill_solid(ledsSecsLabel, NUM_LEDS__S9, CRGB::Green);
+//  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Gold);
+//  fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Purple);
 
   // send the 'leds' array out to the actual LED strip
   FastLEDshowESP32();
