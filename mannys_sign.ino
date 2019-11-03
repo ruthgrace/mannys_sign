@@ -12,49 +12,47 @@ const char* ssid       = "Noisebridge";
 const char* password   = "";
 
 const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = -28800;
+const long  gmtOffset_sec = -28800; // -0800
 const int   daylightOffset_sec = 3600;
 
-#define DATA_PIN__S2 19
-#define DATA_PIN__S3 14
-#define DATA_PIN__S4 2
-#define DATA_PIN__S5 22
-#define DATA_PIN__S6 4
-#define DATA_PIN__S9 17
-#define DATA_PIN__S7 0
-#define DATA_PIN__S8 16
-#define DATA_PIN__S1 5
+#define DATA_PIN__S1 5  // "ELECTION COUNTDOWN"
+#define DATA_PIN__S2 19 // Days counter
+#define DATA_PIN__S3 14 // Days label
+#define DATA_PIN__S4 2  // Hours counter
+#define DATA_PIN__S5 22 // Hours label
+#define DATA_PIN__S6 4  // Minutes counter
+#define DATA_PIN__S7 0  // Minutes label
+#define DATA_PIN__S8 16 // Seconds counter
+#define DATA_PIN__S9 17 // Seconds label
 
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
-#define NUM_LEDS__S2 300
-#define NUM_LEDS__S4 200
-#define NUM_LEDS__S6 200
-#define NUM_LEDS__S8 200
+#define NUM_LEDS__S1 300 // # LEDs for title display
+#define NUM_LEDS__S2 300 // # LEDs for days counter (3 digits)
+#define NUM_LEDS__S4 200 // # LEDs for hours counter
+#define NUM_LEDS__S6 200 // # LEDs for minutes counter
+#define NUM_LEDS__S8 200 // # LEDs for seconds counter
 
-#define NUM_LEDS__LABEL 50
-
-#define NUM_LEDS__S9 50
-#define NUM_LEDS__S7 50
-#define NUM_LEDS__S5 50
-#define NUM_LEDS__S3 50
-#define NUM_LEDS__S1 300
+#define NUM_LEDS__LABEL 50 // Assume all labels are 50 leds
 
 CRGB ledsDays[NUM_LEDS__S2];
 CRGB ledsHours[NUM_LEDS__S4];
 CRGB ledsMinutes[NUM_LEDS__S6];
 CRGB ledsSeconds[NUM_LEDS__S8];
-CRGB ledsMinsLabel[NUM_LEDS__S7];
-CRGB ledsHoursLabel[NUM_LEDS__S5];
-CRGB ledsDaysLabel[NUM_LEDS__S3];
-CRGB ledsSecsLabel[NUM_LEDS__S9];
+CRGB ledsMinsLabel[NUM_LEDS__LABEL];
+CRGB ledsHoursLabel[NUM_LEDS__LABEL];
+CRGB ledsDaysLabel[NUM_LEDS__LABEL];
+CRGB ledsSecsLabel[NUM_LEDS__LABEL];
 CRGB ledsTitle[NUM_LEDS__S1];
 
+// Global brightness cap
 #define BRIGHTNESS         192
+
+// Frame rate. Needs to be high for things like fade to work well
 #define FRAMES_PER_SECOND  120
 
-/* ESP32 specific stuff to avoid flickering?? */
+/* ESP32 specific stuff to avoid flickering. Don't touch this */
 
 // -- The core to run FastLED.show()
 #define FASTLED_SHOW_CORE 0
@@ -102,11 +100,15 @@ void FastLEDshowTask(void *pvParameters)
   }
 }
 
+/* Ok, you can touch the code again beyond here  */
+
+// Definition of one segment in a digit
 struct DigitRegion {
   uint8_t start;
   uint8_t end;
 };
 
+// Definition of how a 7 segment digit is laid out
 struct DigitLayout {
   struct DigitRegion top;
   struct DigitRegion leftTop;
@@ -257,6 +259,7 @@ const struct DigitDisplay secs2 = {
   ledsSeconds
 };
 
+// We need to connect to the WiFi so we can get the current time
 void setupWifi() {
   Serial.printf("Connecting to %s ", ssid);
   WiFi.begin(ssid, password);
@@ -282,32 +285,32 @@ void setup() {
 
   Serial.begin(9600);
 
+  // Connect to wifi, set time, then disconnect
   setupWifi();
-
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   printLocalTime();
-
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
 
+  pinMode(DATA_PIN__S1, OUTPUT);
   pinMode(DATA_PIN__S2, OUTPUT);
   pinMode(DATA_PIN__S3, OUTPUT);
   pinMode(DATA_PIN__S4, OUTPUT);
   pinMode(DATA_PIN__S5, OUTPUT);
   pinMode(DATA_PIN__S6, OUTPUT);
-  pinMode(DATA_PIN__S9, OUTPUT);
   pinMode(DATA_PIN__S7, OUTPUT);
   pinMode(DATA_PIN__S8, OUTPUT);
+  pinMode(DATA_PIN__S9, OUTPUT);
 
   FastLED.addLeds<LED_TYPE, DATA_PIN__S1, COLOR_ORDER>(ledsTitle, NUM_LEDS__S1).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S2, COLOR_ORDER>(ledsDays, NUM_LEDS__S2).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S3, COLOR_ORDER>(ledsDaysLabel, NUM_LEDS__S3).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S3, COLOR_ORDER>(ledsDaysLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S4, COLOR_ORDER>(ledsHours, NUM_LEDS__S4).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S5, COLOR_ORDER>(ledsHoursLabel, NUM_LEDS__S5).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S5, COLOR_ORDER>(ledsHoursLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S6, COLOR_ORDER>(ledsMinutes, NUM_LEDS__S6).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S7, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__S7).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S7, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, DATA_PIN__S8, COLOR_ORDER>(ledsSeconds, NUM_LEDS__S8).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__S9).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
@@ -475,6 +478,15 @@ void loop() {
     fadeToBlackBy(ledsMinutes, NUM_LEDS__S6, 20);
   }
 
+  fill_label(ledsMinsLabel);
+  fill_label(ledsSecsLabel);
+  fill_label(ledsHoursLabel);
+  fill_label(ledsDaysLabel);
+
+//  uint8_t highlightPosition = scale8(beat8(60), NUM_LEDS__LABEL / 2);
+//  ledsMinsLabel[highlightPosition] = CRGB::White;
+//  ledsMinsLabel[highlightPosition * 2] = CRGB::White;
+
   struct tm now;
   if (!getLocalTime(&now)) {
     Serial.println("Failed to obtain time");
@@ -516,11 +528,6 @@ void loop() {
 
   drawDigit(secs1, secsOnly / 10);
   drawDigit(secs2, secsOnly % 10);
-
-  fill_label(ledsMinsLabel);
-  fill_label(ledsSecsLabel);
-  fill_label(ledsHoursLabel);
-  fill_label(ledsDaysLabel);
 
   fill_solid(ledsTitle, NUM_LEDS__S1, CRGB::Blue);
 
