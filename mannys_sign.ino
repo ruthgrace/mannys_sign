@@ -126,15 +126,15 @@ struct DigitLayout daysDigit1 = {
 
 struct DigitLayout daysDigit2 = {
   { 95, 103 },
-  { 105, 115 }, // left top
+  { 105, 114 }, // left top
   { 113, 123 }, // left bottom
-  { 151, 161 }, // right top
-  { 140, 152 }, // right bottom
-  { 127, 138 }, // center
+  { 143, 153 }, // right top
+  { 135, 144 }, // right bottom
+  { 125, 132 }, // bottom
   { 79, 86 }
 };
 
-uint8_t gVisualizeRegions[] = { 0, 1, 2 };
+uint8_t gVisualizeRegions[] = { 5, 4, 3 };
 uint8_t gVisualizeRegionIndex = 0;
 uint8_t gVisualizeRegion = gVisualizeRegions[0];
 
