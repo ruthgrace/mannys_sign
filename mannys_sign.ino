@@ -134,6 +134,16 @@ struct DigitLayout daysDigit2 = {
   { 80, 89 }
 };
 
+struct DigitLayout daysDigit3 = {
+  { 91, 105 },
+  { 106, 116 }, // left top
+  { 115, 124 }, // left bottom
+  { 151, 160 }, // right top
+  { 139, 152 }, // right bottom
+  { 125, 138 },
+  { 80, 89 }
+};
+
 struct DigitLayout hoursDigit1 = {
   { 0, 8 },
   { 48, 58 }, // left top
@@ -336,8 +346,8 @@ void fill_region(struct DigitRegion &region, const CRGB &color) {
   fill_solid(ledsHours + region.start, region.end - region.start, color);
 }
 
-void paint_region(struct CRGB *leds, const struct DigitRegion &region) {
-  fill_solid(leds + region.start, region.end - region.start, CRGB::Red);
+void paint_region(struct CRGB *leds, const struct DigitRegion &region, const CRGB &color = CRGB::Red) {
+  fill_solid(leds + region.start, region.end - region.start, color);
 }
 
 void paintRight(const struct DigitDisplay &disp) {
@@ -460,6 +470,19 @@ void drawDigit(const struct DigitDisplay &disp, time_t digit) {
 
 uint8_t gHue = 0;
 
+void visualize_region(struct CRGB *leds, const struct DigitRegion &region) {
+  struct CRGB *ledsRegion = leds + region.start;
+  uint16_t numLeds = region.end - region.start;
+
+  fill_solid(ledsRegion, numLeds, CRGB::Red);
+
+  ledsRegion[0] = CRGB::Blue;
+  ledsRegion[1] = CRGB::Green;
+
+  ledsRegion[numLeds - 1] = CRGB::Yellow;
+  ledsRegion[numLeds - 2] = CRGB::DeepPink;
+}
+
 void loop() {
   FastLED.clear();
 
@@ -474,13 +497,18 @@ void loop() {
   drawDigit(mins2, seconds % 10);
   drawDigit(secs1, seconds / 10);
   drawDigit(secs2, seconds % 10);
-  drawDigit(days1, seconds / 10);
-  drawDigit(days2, seconds % 10);
-
-  fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
-  fill_solid(ledsSecsLabel, NUM_LEDS__S7, CRGB::Green);
-  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Red);
-  fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Red);
+//  drawDigit(days1, seconds / 10);
+//  drawDigit(days2, seconds % 10);
+//  drawDigit(days1, 1);
+//  drawDigit(days2, 2);
+//  paintLeft(days1);
+  visualize_region(days1.leds, days1.layout.leftTop);
+  
+//
+//  fill_solid(ledsMinsLabel, NUM_LEDS__S9, CRGB::Green);
+//  fill_solid(ledsSecsLabel, NUM_LEDS__S7, CRGB::Green);
+//  fill_solid(ledsHoursLabel, NUM_LEDS__S5, CRGB::Red);
+//  fill_solid(ledsDaysLabel, NUM_LEDS__S3, CRGB::Red);
 
   // send the 'leds' array out to the actual LED strip
   FastLEDshowESP32();
