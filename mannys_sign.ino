@@ -1,5 +1,3 @@
-#include <Arduino.h>
-#include <Arduino_FreeRTOS.h>
 #include <FastLED.h>
 
 FASTLED_USING_NAMESPACE
@@ -8,6 +6,8 @@ FASTLED_USING_NAMESPACE
 #include <sys/time.h>
 
 #include <WiFi.h>
+#include <Arduino_FreeRTOS.h>
+#include <task.h>
 #include "time.h"
 
 const char* ssid       = "Noisebridge";
