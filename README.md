@@ -19,3 +19,4 @@ find the bug face shaped platformio icon on the left side of your VS Code. Under
 ## hardware
 
 I'm using an ESP32 from HiLetGo: https://www.amazon.com/gp/product/B0718T232Z/
+And a breakout board from KeeYees: https://www.amazon.com/dp/B09PYW1HC9
