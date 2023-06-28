@@ -8,8 +8,8 @@ FASTLED_USING_NAMESPACE
 #include <WiFi.h>
 #include "time.h"
 
-const char* ssid       = "Noisebridge";
-const char* password   = "";
+const char* ssid       = "breggruggg";
+const char* password   = "imbreggstatic";
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -28800; // -0800
