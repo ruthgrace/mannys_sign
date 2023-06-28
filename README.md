@@ -12,7 +12,7 @@ find the bug face shaped platformio icon on the left side of your VS Code. Under
 
 ### upload
 
-1. plug board into computer (usb to usb b)
+1. plug board into computer (usb to usb micro)
 2. Looking at the board with the Espressif right side up on the chip, press and hold the button on the bottom right, beside the power jack on the board. Keep holding down while you do step 3
 3. find the bug face shaped platformio icon on the left side of your VS Code. Under Project Tasks > hiletgo-esp32 > General. click Upload
 
