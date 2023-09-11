@@ -451,14 +451,14 @@ void fill_label(struct CRGB *labelLeds) {
   fill_solid(labelLeds, NUM_LEDS__LABEL, CRGB::Blue);
 }
 
-// End date/time: 8pm March 5 2024
+// End date/time: 8pm November 5 2024
 // See: http://www.cplusplus.com/reference/ctime/tm/
 struct tm election_date = {
   0,
   0,
   20,
   5,
-  2,
+  10,
   124,
   3,
   64,
