@@ -31,25 +31,25 @@ void loop() {
     FastLED.show();
     delay(8);
   }
-  // fade off to blue 1 second
+  // fade off to green 1 second
   for (int i = 0; i <= 120; i++) {
     leds[i] = CRGB (0, 2*i, 0);
     FastLED.show();
     delay(8);
   }
-  // fade blue to off 1 second
+  // fade green to off 1 second
   for (int i = 120; i >= 0; i--) {
     leds[i] = CRGB (0, 2*i, 0);
     FastLED.show();
     delay(8);
   }
-  // fade off to green 1 second
+  // fade off to blue 1 second
   for (int i = 0; i <= 120; i++) {
     leds[i] = CRGB (0, 0, 2*i);
     FastLED.show();
     delay(8);
   }
-  // fade green to off 1 second
+  // fade blue to off 1 second
   for (int i = 120; i >= 0; i--) {
     leds[i] = CRGB (0, 0, 2*i);
     FastLED.show();
@@ -64,6 +64,42 @@ void loop() {
   // fade white to off 1 second
   for (int i = 120; i >= 0; i--) {
     leds[i] = CRGB (2*i, 2*i, 2*i);
+    FastLED.show();
+    delay(8);
+  }
+  // fade off to purple 1 second
+  for (int i = 0; i <= 120; i++) {
+    leds[i] = CRGB (2*i, 0, 2*i;
+    FastLED.show();
+    delay(8);
+  }
+  // fade purple to off 1 second
+  for (int i = 120; i >= 0; i--) {
+    leds[i] = CRGB (2*i, 0, 2*i);
+    FastLED.show();
+    delay(8);
+  }
+  // fade off to orange 1 second
+  for (int i = 0; i <= 120; i++) {
+    leds[i] = CRGB (2*i, 2*i, 0);
+    FastLED.show();
+    delay(8);
+  }
+  // fade orange to off 1 second
+  for (int i = 120; i >= 0; i--) {
+    leds[i] = CRGB (2*i, 2*i, 0);
+    FastLED.show();
+    delay(8);
+  }
+  // fade off to cyan 1 second
+  for (int i = 0; i <= 120; i++) {
+    leds[i] = CRGB (0, 2*i, 2*i);
+    FastLED.show();
+    delay(8);
+  }
+  // fade cyan to off 1 second
+  for (int i = 120; i >= 0; i--) {
+    leds[i] = CRGB (0, 2*i, 2*i);
     FastLED.show();
     delay(8);
   }
