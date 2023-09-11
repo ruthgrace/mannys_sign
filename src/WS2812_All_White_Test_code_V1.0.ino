@@ -55,4 +55,16 @@ void loop() {
     FastLED.show();
     delay(8);
   }
+  // fade off to white 1 second
+  for (int i = 0; i <= 120; i++) {
+    leds[i] = CRGB (2*i, 2*i, 2*i);
+    FastLED.show();
+    delay(8);
+  }
+  // fade white to off 1 second
+  for (int i = 120; i >= 0; i--) {
+    leds[i] = CRGB (2*i, 2*i, 2*i);
+    FastLED.show();
+    delay(8);
+  }
 }
