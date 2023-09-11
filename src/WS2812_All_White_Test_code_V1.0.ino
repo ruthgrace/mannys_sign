@@ -13,11 +13,11 @@ void setup() {
 }
 
 void loop() {
-
-  for (int i = 0; i <= 300; i++) {
+  // bright white 5 seconds
+  for (int i = 0; i <= 600; i++) {
     leds[i] = CRGB ( 255, 255, 255);
     FastLED.show();
-    delay(40);
+    delay(8);
   }
   for (int i = 300; i >= 0; i--) {
     leds[i] = CRGB ( 255, 255, 255);
