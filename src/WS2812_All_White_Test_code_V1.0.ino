@@ -69,7 +69,7 @@ void loop() {
   }
   // fade off to purple 1 second
   for (int i = 0; i <= 120; i++) {
-    leds[i] = CRGB (2*i, 0, 2*i;
+    leds[i] = CRGB (2*i, 0, 2*i);
     FastLED.show();
     delay(8);
   }
