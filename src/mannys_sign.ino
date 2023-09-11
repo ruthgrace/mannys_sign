@@ -15,15 +15,15 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -28800; // -0800
 const int   daylightOffset_sec = 3600;
 
-#define DATA_PIN__S1 5  // "ELECTION COUNTDOWN"
-#define DATA_PIN__S2 19 // Days counter
-#define DATA_PIN__S3 14 // Days label
-#define DATA_PIN__S4 2  // Hours counter
-#define DATA_PIN__S5 22 // Hours label
-#define DATA_PIN__S6 4  // Minutes counter
-#define DATA_PIN__S7 0  // Minutes label
-#define DATA_PIN__S8 16 // Seconds counter
-#define DATA_PIN__S9 17 // Seconds label
+#define DATA_PIN__S1 19   // "ELECTION COUNTDOWN"
+#define DATA_PIN__S2 18   // Days counter
+#define DATA_PIN__S3 5     // Days label
+#define DATA_PIN__S4 17   // Hours counter
+#define DATA_PIN__S5 16   // Hours label
+#define DATA_PIN__S6 4     // Minutes counter
+#define DATA_PIN__S7 14   // Minutes label
+#define DATA_PIN__S8 15   // Seconds counter
+#define DATA_PIN__S9 13   // Seconds label
 
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
