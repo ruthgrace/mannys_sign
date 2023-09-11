@@ -19,9 +19,40 @@ void loop() {
     FastLED.show();
     delay(8);
   }
-  for (int i = 300; i >= 0; i--) {
-    leds[i] = CRGB ( 255, 255, 255);
+  // fade off to red 1 second
+  for (int i = 0; i <= 120; i++) {
+    leds[i] = CRGB ( 2*i, 0, 0);
     FastLED.show();
-    delay(40);
- }
+    delay(8);
+  }
+  // fade red to off 1 second
+  for (int i = 120; i >= 0; i--) {
+    leds[i] = CRGB ( 2*i, 0, 0);
+    FastLED.show();
+    delay(8);
+  }
+  // fade off to blue 1 second
+  for (int i = 0; i <= 120; i++) {
+    leds[i] = CRGB (0, 2*i, 0);
+    FastLED.show();
+    delay(8);
+  }
+  // fade blue to off 1 second
+  for (int i = 120; i >= 0; i--) {
+    leds[i] = CRGB (0, 2*i, 0);
+    FastLED.show();
+    delay(8);
+  }
+  // fade off to green 1 second
+  for (int i = 0; i <= 120; i++) {
+    leds[i] = CRGB (0, 0, 2*i);
+    FastLED.show();
+    delay(8);
+  }
+  // fade green to off 1 second
+  for (int i = 120; i >= 0; i--) {
+    leds[i] = CRGB (0, 0, 2*i);
+    FastLED.show();
+    delay(8);
+  }
 }
