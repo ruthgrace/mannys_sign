@@ -1,5 +1,8 @@
 #include <FastLED.h>
 
+// INSTRUCTIONS FOR USE:
+// after flashing the code onto the board and plugging the board in, plug in the LEDs and hit the RESET button on the board.
+
   //for fixing any bootstrap pin issues on startup for GPIO 13, 15 (unused right now)
 //PIN_FUNC_SELECT(GPIO_PIN_REG_13, PIN_FUNC_GPIO);
 
