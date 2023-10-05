@@ -20,3 +20,11 @@ find the bug face shaped platformio icon on the left side of your VS Code. Under
 
 I'm using an ESP32 from HiLetGo: https://www.amazon.com/gp/product/B0718T232Z/
 And a breakout board from KeeYees: https://www.amazon.com/dp/B09PYW1HC9
+
+### Miscellaneous build notes
+* use syringe with isopropyl alcohol to remove hot glue
+* there are 3d printed clips holding down the aluminum backed LEDs. Some are 1mm and some are 2mm, required because of wood warping.
+* Screws:
+  * MCx6mm for the wooden board where you don't want it to go through the plexiglass
+  * MCx10mm for the power board (thicker wood piece, no plexiglass)
+  * MCx16mm to go through the plexiglass and wooden board, into 3d printed nuts
