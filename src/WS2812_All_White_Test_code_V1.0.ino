@@ -59,17 +59,17 @@ void setup() {
 }
 
 void loop() {
-  //Fade on bright white 
+  //Fade on bright blue 
   for (; i <= NUMOFLEDS; i++) {
-    DATA_S1[i] = CRGB(255, 255, 255);
-    DATA_S2[i] = CRGB(255, 255, 255);
-    DATA_S3[i] = CRGB(255, 255, 255);
-    DATA_S4[i] = CRGB(255, 255, 255);
-    DATA_S5[i] = CRGB(255, 255, 255);
-    DATA_S6[i] = CRGB(255, 255, 255);
-    DATA_S7[i] = CRGB(255, 255, 255);
-    DATA_S8[i] = CRGB(255, 255, 255);
-    DATA_S9[i] = CRGB(255, 255, 255);
+    DATA_S1[i] = CRGB(10, 10, 255);
+    DATA_S2[i] = CRGB(10, 10, 255);
+    DATA_S3[i] = CRGB(10, 10, 255);
+    DATA_S4[i] = CRGB(10, 10, 255);
+    DATA_S5[i] = CRGB(10, 10, 255);
+    DATA_S6[i] = CRGB(10, 10, 255);
+    DATA_S7[i] = CRGB(10, 10, 255);
+    DATA_S8[i] = CRGB(10, 10, 255);
+    DATA_S9[i] = CRGB(10, 10, 255);
     FastLED.show();
     delay(5);
   }
