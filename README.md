@@ -21,6 +21,26 @@ find the bug face shaped platformio icon on the left side of your VS Code. Under
 I'm using an ESP32 from HiLetGo: https://www.amazon.com/gp/product/B0718T232Z/
 And a breakout board from KeeYees: https://www.amazon.com/dp/B09PYW1HC9
 
+### installation
+There are 3 power supplies. The top two power 3 panels, and the bottom one powers 2 panels. From top to bottom this is the ideal arrangement of panels being plugged in to distribute power:
+
+First power supply
+
+* 88
+* 88
+* hours
+
+Second power supply
+
+* days
+* 88
+* ELECTION COUNTDOWN
+
+Third power supply
+
+* 888
+* minutes
+
 ### Miscellaneous build notes
 * use syringe with isopropyl alcohol to remove hot glue
 * there are 3d printed clips holding down the aluminum backed LEDs. Some are 1mm and some are 2mm, required because of wood warping.
