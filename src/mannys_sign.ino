@@ -8,7 +8,7 @@ FASTLED_USING_NAMESPACE
 #include <WiFi.h>
 #include "time.h"
 
-const char* ssid       = "breggruggg";
+const char* ssid       = "breggrug";
 const char* password   = "imbreggstatic";
 
 const char* ntpServer = "pool.ntp.org";
@@ -451,19 +451,32 @@ void fill_label(struct CRGB *labelLeds) {
   fill_solid(labelLeds, NUM_LEDS__LABEL, CRGB::Blue);
 }
 
+//test code for 12:05am Tues Dec 19 2024
+struct tm election_date = {
+  0,
+  5,
+  0,
+  19,
+  11,
+  123,
+  2,
+  352,
+  0
+};
+
 // End date/time: 8pm November 5 2024
 // See: http://www.cplusplus.com/reference/ctime/tm/
-struct tm election_date = {
+/* struct tm election_date = {
   0,
   0,
   20,
   5,
   10,
   124,
-  3,
-  64,
+  2,
+  309,
   0
-};
+}; */
 
 int gLastSec = 0;
 
