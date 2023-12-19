@@ -22,7 +22,7 @@ I'm using an ESP32 from HiLetGo: https://www.amazon.com/gp/product/B0718T232Z/
 And a breakout board from KeeYees: https://www.amazon.com/dp/B09PYW1HC9
 
 ### installation
-There are 3 power supplies. The top two power 3 panels, and the bottom one powers 2 panels. From top to bottom this is the ideal arrangement of panels being plugged in to distribute power:
+There are 3 power supplies. The top powers 3 panels, the middle powers 4 panels, and the bottom one powers 2 panels. From top to bottom this is the ideal arrangement of panels being plugged in to distribute power:
 
 First power supply
 
@@ -33,6 +33,7 @@ First power supply
 Second power supply
 
 * days
+* seconds
 * 88
 * ELECTION COUNTDOWN
 
