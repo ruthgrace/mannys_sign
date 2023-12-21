@@ -25,6 +25,16 @@ const int   daylightOffset_sec = 3600;
 #define DATA_PIN__S8 15   // Seconds counter
 #define DATA_PIN__S9 13   // Seconds label
 
+#define S1  19
+#define S2  18
+#define S3  5
+#define S4  17
+#define S5  16
+#define S6  4
+#define S7  14
+#define S8  15
+#define S9  13
+
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
@@ -452,7 +462,7 @@ void fill_label(struct CRGB *labelLeds) {
 }
 
 //test code for 12:05am Tues Dec 19 2024
-struct tm election_date = {
+/* struct tm election_date = {
   0,
   5,
   0,
@@ -462,11 +472,11 @@ struct tm election_date = {
   2,
   352,
   0
-};
+}; */
 
 // End date/time: 8pm November 5 2024
 // See: http://www.cplusplus.com/reference/ctime/tm/
-/* struct tm election_date = {
+ struct tm election_date = {
   0,
   0,
   20,
@@ -476,7 +486,7 @@ struct tm election_date = {
   2,
   309,
   0
-}; */
+};
 
 int gLastSec = 0;
 
