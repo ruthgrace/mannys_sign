@@ -24,23 +24,23 @@ And a breakout board from KeeYees: https://www.amazon.com/dp/B09PYW1HC9
 ### installation
 There are 3 power supplies. The top powers 3 panels, the middle powers 4 panels, and the bottom one powers 2 panels. From top to bottom this is the ideal arrangement of panels being plugged in to distribute power:
 
-First power supply
+First power supply | Pin name in code
 
-* 88
-* 88
-* hours
+* 88 | S1
+* 88 | S2
+* hours | S3
 
-Second power supply
+Second power supply | Pin name in code
 
-* days
-* seconds
-* 88
-* ELECTION COUNTDOWN
+* days | S4
+* seconds | S5
+* 88 | S6
+* ELECTION COUNTDOWN | S7
 
-Third power supply
+Third power supply | Pin name in code
 
-* 888
-* minutes
+* 888 | S8
+* minutes | S9
 
 ### Miscellaneous build notes
 * use syringe with isopropyl alcohol to remove hot glue
