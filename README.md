@@ -26,15 +26,15 @@ There are 3 power supplies. The top powers 3 panels, the middle powers 4 panels,
 
 First power supply | Pin name in code
 
-* 88 | S1
-* 88 | S2
+* 88 (seconds) | S1
+* 88 (minutes) | S2
 * hours | S3
 
 Second power supply | Pin name in code
 
 * days | S4
 * seconds | S5
-* 88 | S6
+* 88 (hours) | S6
 * ELECTION COUNTDOWN | S7
 
 Third power supply | Pin name in code
