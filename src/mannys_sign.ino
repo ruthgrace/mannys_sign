@@ -56,6 +56,8 @@ CRGB ledsDaysLabel[NUM_LEDS__LABEL];
 CRGB ledsSecsLabel[NUM_LEDS__LABEL];
 CRGB ledsTitle[NUM_LEDS__LARGE];
 
+char stringBuffer [128]; // for printing out countdown to serial monitor
+
 // Global brightness cap
 #define BRIGHTNESS         192
 
@@ -532,22 +534,21 @@ void loop() {
 
   double diff = difftime(electionTime, nowTime);
   unsigned long daysDiff = (unsigned long)diff / 60 / 60 / 24;
+  uint8_t hoursOnly = ((unsigned long)(diff) / 60 / 60) % 24;
+  uint8_t minsOnly = ((unsigned long)(diff) / 60) % 60;
+  uint8_t secsOnly = (unsigned long)(diff) % 60;
+  sprintf (stringBuffer, "Countdown: %3d days, %2d hours, %2d minutes, and %2d seconds.\r\n", daysDiff, hoursOnly, minsOnly, secsOnly);
+  Serial.println(stringBuffer);
 
   drawDigit(days1, daysDiff / 100);
   drawDigit(days2, daysDiff % 100 / 10);
   drawDigit(days3, daysDiff % 100 % 10);
 
-  uint8_t hoursOnly = ((unsigned long)(diff) / 60 / 60) % 24;
-
   drawDigit(hours1, hoursOnly / 10);
   drawDigit(hours2, hoursOnly % 10);
 
-  uint8_t minsOnly = ((unsigned long)(diff) / 60) % 60;
-
   drawDigit(mins1, minsOnly / 10);
   drawDigit(mins2, minsOnly % 10);
-
-  uint8_t secsOnly = (unsigned long)(diff) % 60;
 
   drawDigit(secs1, secsOnly / 10);
   drawDigit(secs2, secsOnly % 10);
