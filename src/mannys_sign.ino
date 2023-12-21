@@ -15,15 +15,19 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = -28800; // -0800
 const int   daylightOffset_sec = 3600;
 
-#define DATA_PIN__S1 19   // "ELECTION COUNTDOWN"
-#define DATA_PIN__S2 18   // Days counter
-#define DATA_PIN__S3 5     // Days label
-#define DATA_PIN__S4 17   // Hours counter
-#define DATA_PIN__S5 16   // Hours label
-#define DATA_PIN__S6 4     // Minutes counter
-#define DATA_PIN__S7 14   // Minutes label
-#define DATA_PIN__S8 15   // Seconds counter
-#define DATA_PIN__S9 13   // Seconds label
+// top power supply
+#define DATA_PIN__S1 19   // Seconds counter
+#define DATA_PIN__S2 18   // Minutes counter
+#define DATA_PIN__S3 5    // Hours label
+#define DATA_PIN__S4 17   // Days label
+// middle power supply
+#define DATA_PIN__S5 16   // Seconds label
+#define DATA_PIN__S6 4    // Hours counter
+#define DATA_PIN__S7 14   // ELECTION COUNTDOWN label
+// bottom power supply
+#define DATA_PIN__S8 15   // Days counter
+#define DATA_PIN__S9 13   // Minutes label
+
 
 #define S1  19
 #define S2  18
@@ -38,23 +42,19 @@ const int   daylightOffset_sec = 3600;
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
-#define NUM_LEDS__S1 300 // # LEDs for title display
-#define NUM_LEDS__S2 300 // # LEDs for days counter (3 digits)
-#define NUM_LEDS__S4 200 // # LEDs for hours counter
-#define NUM_LEDS__S6 200 // # LEDs for minutes counter
-#define NUM_LEDS__S8 200 // # LEDs for seconds counter
-
+#define NUM_LEDS__LARGE 300 // # LEDs for title display and days counter (3 digits)
+#define NUM_LEDS__COUNTER 200 // Assume all counters are 200 leds
 #define NUM_LEDS__LABEL 50 // Assume all labels are 50 leds
 
-CRGB ledsDays[NUM_LEDS__S2];
-CRGB ledsHours[NUM_LEDS__S4];
-CRGB ledsMinutes[NUM_LEDS__S6];
-CRGB ledsSeconds[NUM_LEDS__S8];
+CRGB ledsDays[NUM_LEDS__LARGE];
+CRGB ledsHours[NUM_LEDS__COUNTER];
+CRGB ledsMinutes[NUM_LEDS__COUNTER];
+CRGB ledsSeconds[NUM_LEDS__COUNTER];
 CRGB ledsMinsLabel[NUM_LEDS__LABEL];
 CRGB ledsHoursLabel[NUM_LEDS__LABEL];
 CRGB ledsDaysLabel[NUM_LEDS__LABEL];
 CRGB ledsSecsLabel[NUM_LEDS__LABEL];
-CRGB ledsTitle[NUM_LEDS__S1];
+CRGB ledsTitle[NUM_LEDS__LARGE];
 
 // Global brightness cap
 #define BRIGHTNESS         192
@@ -312,15 +312,15 @@ void setup() {
   pinMode(DATA_PIN__S8, OUTPUT);
   pinMode(DATA_PIN__S9, OUTPUT);
 
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S1, COLOR_ORDER>(ledsTitle, NUM_LEDS__S1).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S2, COLOR_ORDER>(ledsDays, NUM_LEDS__S2).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S3, COLOR_ORDER>(ledsDaysLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S4, COLOR_ORDER>(ledsHours, NUM_LEDS__S4).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S5, COLOR_ORDER>(ledsHoursLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S6, COLOR_ORDER>(ledsMinutes, NUM_LEDS__S6).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S7, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S8, COLOR_ORDER>(ledsSeconds, NUM_LEDS__S8).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S1, COLOR_ORDER>(ledsSeconds, NUM_LEDS__COUNTER).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S2, COLOR_ORDER>(ledsMinutes, NUM_LEDS__COUNTER).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S3, COLOR_ORDER>(ledsHoursLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S4, COLOR_ORDER>(ledsDaysLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S5, COLOR_ORDER>(ledsSecsLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S6, COLOR_ORDER>(ledsHours, NUM_LEDS__COUNTER).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S7, COLOR_ORDER>(ledsTitle, NUM_LEDS__LARGE).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S8, COLOR_ORDER>(ledsDays, NUM_LEDS__LARGE).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN__S9, COLOR_ORDER>(ledsMinsLabel, NUM_LEDS__LABEL).setCorrection(TypicalLEDStrip);
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
@@ -492,13 +492,13 @@ int gLastSec = 0;
 
 void loop() {
   // We always fade the seconds display since it is changing every second
-  fadeToBlackBy(ledsSeconds, NUM_LEDS__S8, 20);
+  fadeToBlackBy(ledsSeconds, NUM_LEDS__COUNTER, 20);
 
   // When the minute is about to change, fade out all the other counters
   if (gLastSec == 0) {
-    fadeToBlackBy(ledsDays, NUM_LEDS__S2, 20);
-    fadeToBlackBy(ledsHours, NUM_LEDS__S4, 20);
-    fadeToBlackBy(ledsMinutes, NUM_LEDS__S6, 20);
+    fadeToBlackBy(ledsDays, NUM_LEDS__LARGE, 20);
+    fadeToBlackBy(ledsHours, NUM_LEDS__COUNTER, 20);
+    fadeToBlackBy(ledsMinutes, NUM_LEDS__COUNTER, 20);
   }
 
   fill_label(ledsMinsLabel);
@@ -552,7 +552,7 @@ void loop() {
   drawDigit(secs1, secsOnly / 10);
   drawDigit(secs2, secsOnly % 10);
 
-  fill_solid(ledsTitle, NUM_LEDS__S1, CRGB::Blue);
+  fill_solid(ledsTitle, NUM_LEDS__LARGE, CRGB::Blue);
 
   // send the 'leds' array out to the actual LED strip
   FastLEDshowESP32();
