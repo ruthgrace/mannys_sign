@@ -22,6 +22,16 @@ I'm using an ESP32 from HiLetGo: https://www.amazon.com/gp/product/B0718T232Z/
 And a breakout board from KeeYees: https://www.amazon.com/dp/B09PYW1HC9
 
 ### installation
+
+#### steps
+
+1. make sure that wifi password is updated correctly in code
+2. plug just the power panel in, monitor with laptop, ensure that wifi connection is successful (you can do this in the restaurant before installing the sign outside)
+3. Check if box needs to be weather proofed/caulked on the back. Do it first if so.
+4. power panel goes behind ELECTION COUNTDOWN panel. Plug in ELECTION COUNTDOWN PANEL first. Add clips to attach next panel. Place and plug other panels in one by one (adding clips each time), leaving gaps between panels to pull the power cords through and plug them into the power panel. When the last panel is plugged in, close remaining gaps by attaching clips between panels
+5. weather proof the box - use acrylic panels and caulking to cover the box
+
+#### panel plugs
 There are 3 power supplies. The top powers 3 panels, the middle powers 4 panels, and the bottom one powers 2 panels. From top to bottom this is the ideal arrangement of panels being plugged in to distribute power:
 
 First power supply | Pin name in code
