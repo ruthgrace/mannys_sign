@@ -58,32 +58,32 @@ struct DigitLayout {
 
 struct DigitLayout daysDigit1 = {
   { 0, 8 },   // top
-  { 48, 58 }, // left top
-  { 40, 49 }, // left bottom
-  { 10, 19 }, // right top
-  { 19, 28 }, // right bottom
-  { 30, 37 }, // bottom
-  { 68, 75 }  // center
+  { 47, 57 }, // left top
+  { 39, 48 }, // left bottom
+  { 9, 18 }, // right top
+  { 18, 27 }, // right bottom
+  { 29, 36 }, // bottom
+  { 67, 74 }  // center
 };
 
 struct DigitLayout daysDigit2 = {
-  { 95, 103 },  // top
-  { 105, 114 }, // left top
-  { 113, 123 }, // left bottom
-  { 143, 153 }, // right top
-  { 135, 144 }, // right bottom
-  { 125, 132 }, // bottom
-  { 79, 86 }    // center
+  { 94, 102 },  // top
+  { 104, 113 }, // left top
+  { 112, 122 }, // left bottom
+  { 142, 152 }, // right top
+  { 134, 143 }, // right bottom
+  { 124, 131 }, // bottom
+  { 78, 85 }    // center
 };
 
 struct DigitLayout daysDigit3 = {
-  { 156, 163 }, // top
-  { 204, 214 }, // left top
-  { 196, 206 }, // left bottom
-  { 166, 175 }, // right top
-  { 175, 184 }, // right bottom
-  { 186, 194 }, // bottom
-  { 223, 231 }  // center
+  { 155, 162 }, // top
+  { 203, 213 }, // left top
+  { 195, 205 }, // left bottom
+  { 165, 174 }, // right top
+  { 174, 183 }, // right bottom
+  { 185, 193 }, // bottom
+  { 222, 230 }  // center
 };
 
 struct DigitLayout hoursDigit1 = {
