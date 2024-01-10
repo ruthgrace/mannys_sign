@@ -98,7 +98,7 @@ struct DigitLayout hoursDigit1 = {
 
 struct DigitLayout hoursDigit2 = {
   { 96, 103 },  // top
-  { 106, 116 }, // left top
+  { 106, 115 }, // left top
   { 115, 124 }, // left bottom
   { 146, 155 }, // right top
   { 137, 147 }, // right bottom
