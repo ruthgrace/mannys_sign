@@ -59,7 +59,7 @@ void setup() {
 }
 
 void loop() {
-  //Fade on bright blue 
+  //Fade on bright white 
   for (; i <= NUMOFLEDS; i++) {
     DATA_S1[i] = CRGB(255, 255, 255);
     DATA_S2[i] = CRGB(255, 255, 255);
