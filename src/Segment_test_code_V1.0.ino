@@ -129,21 +129,21 @@ struct DigitLayout minsDigit2 = {
 struct DigitLayout secsDigit1 = {
   { 0, 8 },   // top
   { 48, 58 }, // left top
-  { 40, 49 }, // left bottom
+  { 39, 49 }, // left bottom
   { 10, 19 }, // right top
   { 18, 29 }, // right bottom
-  { 28, 39 }, // bottom
+  { 28, 37 }, // bottom
   { 68, 78 }  // center
 };
 
 struct DigitLayout secsDigit2 = {
   { 91, 105 },   // top
   { 106, 116 }, // left top
-  { 115, 124 }, // left bottom
-  { 151, 160 }, // right top
-  { 139, 152 }, // right bottom
-  { 125, 138 }, // bottom
-  { 80, 89 }    // center
+  { 114, 124 }, // left bottom
+  { 149, 159 }, // right top
+  { 138, 150 }, // right bottom
+  { 127, 136 }, // bottom
+  { 79, 89 }    // center
 };
 
 void color_top_vertical_segments(struct CRGB *data_pin, DigitLayout digit_layout) {
