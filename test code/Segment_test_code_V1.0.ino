@@ -69,7 +69,7 @@ struct DigitLayout daysDigit1 = {
 struct DigitLayout daysDigit2 = {
   { 94, 102 },  // top
   { 104, 113 }, // left top
-  { 112, 122 }, // left bottom
+  { 112, 121 }, // left bottom
   { 142, 152 }, // right top
   { 134, 143 }, // right bottom
   { 124, 131 }, // bottom
@@ -78,8 +78,8 @@ struct DigitLayout daysDigit2 = {
 
 struct DigitLayout daysDigit3 = {
   { 155, 162 }, // top
-  { 203, 213 }, // left top
-  { 195, 205 }, // left bottom
+  { 204, 213 }, // left top
+  { 195, 204 }, // left bottom
   { 165, 174 }, // right top
   { 174, 183 }, // right bottom
   { 185, 193 }, // bottom
@@ -109,7 +109,7 @@ struct DigitLayout hoursDigit2 = {
 struct DigitLayout minsDigit1 = {
   { 0, 7 },   // top
   { 49, 58 }, // left top
-  { 40, 50 }, // left bottom
+  { 40, 49 }, // left bottom
   { 10, 19 }, // right top
   { 19, 28 }, // right bottom
   { 30, 38 }, // bottom
@@ -131,17 +131,17 @@ struct DigitLayout secsDigit1 = {
   { 48, 58 }, // left top
   { 39, 49 }, // left bottom
   { 10, 19 }, // right top
-  { 18, 29 }, // right bottom
+  { 19, 29 }, // right bottom
   { 28, 37 }, // bottom
   { 68, 78 }  // center
 };
 
 struct DigitLayout secsDigit2 = {
   { 91, 105 },   // top
-  { 106, 116 }, // left top
-  { 114, 124 }, // left bottom
+  { 106, 115 }, // left top
+  { 115, 124 }, // left bottom
   { 149, 159 }, // right top
-  { 138, 150 }, // right bottom
+  { 138, 149 }, // right bottom
   { 127, 136 }, // bottom
   { 79, 89 }    // center
 };
