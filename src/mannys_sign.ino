@@ -46,6 +46,14 @@ const int   daylightOffset_sec = 3600;
 #define NUM_LEDS__COUNTER 200 // Assume all counters are 200 leds
 #define NUM_LEDS__LABEL 50 // Assume all labels are 50 leds
 
+CRGB RED = CRGB(255, 0, 0);
+CRGB digitsColor = RED;
+uint8_t rShift = 255;
+uint8_t gShift = 0;
+uint8_t bShift = 0;
+// digits shift from blue to red and back after the countdown has ended
+bool goingToBlue = false;
+
 CRGB ledsDays[NUM_LEDS__LARGE];
 CRGB ledsHours[NUM_LEDS__COUNTER];
 CRGB ledsMinutes[NUM_LEDS__COUNTER];
@@ -55,6 +63,8 @@ CRGB ledsHoursLabel[NUM_LEDS__LABEL];
 CRGB ledsDaysLabel[NUM_LEDS__LABEL];
 CRGB ledsSecsLabel[NUM_LEDS__LABEL];
 CRGB ledsTitle[NUM_LEDS__LARGE];
+
+bool countdownEnded = false;
 
 char stringBuffer [128]; // for printing out countdown to serial monitor
 
@@ -336,122 +346,122 @@ void fill_region(struct DigitRegion &region, const CRGB &color) {
   fill_solid(ledsHours + region.start, region.end - region.start, color);
 }
 
-void paint_region(struct CRGB *leds, const struct DigitRegion &region, const CRGB &color = CRGB::Red) {
+void paint_region(struct CRGB *leds, const struct DigitRegion &region, const CRGB &color) {
   fill_solid(leds + region.start, region.end - region.start, color);
 }
 
-void paintRight(const struct DigitDisplay &disp) {
-  paint_region(disp.leds, disp.layout.rightTop);
-  paint_region(disp.leds, disp.layout.rightBottom);
+void paintRight(const struct DigitDisplay &disp, const CRGB &color) {
+  paint_region(disp.leds, disp.layout.rightTop, color);
+  paint_region(disp.leds, disp.layout.rightBottom, color);
 }
 
-void paintLeft(const struct DigitDisplay &disp) {
-  paint_region(disp.leds, disp.layout.leftTop);
-  paint_region(disp.leds, disp.layout.leftBottom);
+void paintLeft(const struct DigitDisplay &disp, const CRGB &color) {
+  paint_region(disp.leds, disp.layout.leftTop, color);
+  paint_region(disp.leds, disp.layout.leftBottom, color);
 }
 
-void draw1(const struct DigitDisplay &disp) {
-  paintRight(disp);
+void draw1(const struct DigitDisplay &disp, CRGB &color) {
+  paintRight(disp, color);
 }
 
-void draw2(const struct DigitDisplay &disp) {
-  paint_region(disp.leds, disp.layout.top);
-  paint_region(disp.leds, disp.layout.center);
-  paint_region(disp.leds, disp.layout.bottom);
+void draw2(const struct DigitDisplay &disp, CRGB &color) {
+  paint_region(disp.leds, disp.layout.top, color);
+  paint_region(disp.leds, disp.layout.center, color);
+  paint_region(disp.leds, disp.layout.bottom, color);
 
-  paint_region(disp.leds, disp.layout.rightTop);
-  paint_region(disp.leds, disp.layout.leftBottom);
+  paint_region(disp.leds, disp.layout.rightTop, color);
+  paint_region(disp.leds, disp.layout.leftBottom, color);
 }
 
-void draw3(const struct DigitDisplay &disp) {
-  paint_region(disp.leds, disp.layout.top);
-  paint_region(disp.leds, disp.layout.center);
-  paint_region(disp.leds, disp.layout.bottom);
-  paintRight(disp);
+void draw3(const struct DigitDisplay &disp, CRGB &color) {
+  paint_region(disp.leds, disp.layout.top, color);
+  paint_region(disp.leds, disp.layout.center, color);
+  paint_region(disp.leds, disp.layout.bottom, color);
+  paintRight(disp, color);
 }
 
-void draw4(const struct DigitDisplay &disp) {
-  paint_region(disp.leds, disp.layout.center);
-  paint_region(disp.leds, disp.layout.leftTop);
-  paintRight(disp);
+void draw4(const struct DigitDisplay &disp, CRGB &color) {
+  paint_region(disp.leds, disp.layout.center, color);
+  paint_region(disp.leds, disp.layout.leftTop, color);
+  paintRight(disp, color);
 }
 
-void draw5(const struct DigitDisplay &disp) {
-  paint_region(disp.leds, disp.layout.top);
-  paint_region(disp.leds, disp.layout.center);
-  paint_region(disp.leds, disp.layout.bottom);
-  paint_region(disp.leds, disp.layout.leftTop);
-  paint_region(disp.leds, disp.layout.rightBottom);
+void draw5(const struct DigitDisplay &disp, CRGB &color) {
+  paint_region(disp.leds, disp.layout.top, color);
+  paint_region(disp.leds, disp.layout.center, color);
+  paint_region(disp.leds, disp.layout.bottom, color);
+  paint_region(disp.leds, disp.layout.leftTop, color);
+  paint_region(disp.leds, disp.layout.rightBottom, color);
 }
 
-void draw6(const struct DigitDisplay &disp) {
-  paint_region(disp.leds, disp.layout.top);
-  paint_region(disp.leds, disp.layout.center);
-  paint_region(disp.leds, disp.layout.bottom);
-  paint_region(disp.leds, disp.layout.rightBottom);
-  paintLeft(disp);
+void draw6(const struct DigitDisplay &disp, CRGB &color) {
+  paint_region(disp.leds, disp.layout.top, color);
+  paint_region(disp.leds, disp.layout.center, color);
+  paint_region(disp.leds, disp.layout.bottom, color);
+  paint_region(disp.leds, disp.layout.rightBottom, color);
+  paintLeft(disp, color);
 }
 
-void draw7(const struct DigitDisplay &disp) {
-  paint_region(disp.leds, disp.layout.top);
-  paintRight(disp);
+void draw7(const struct DigitDisplay &disp, CRGB &color) {
+  paint_region(disp.leds, disp.layout.top, color);
+  paintRight(disp, color);
 }
 
-void draw8(const struct DigitDisplay &disp) {
-  paintRight(disp);
-  paintLeft(disp);
+void draw8(const struct DigitDisplay &disp, CRGB &color) {
+  paintRight(disp, color);
+  paintLeft(disp, color);
 
-  paint_region(disp.leds, disp.layout.top);
-  paint_region(disp.leds, disp.layout.center);
-  paint_region(disp.leds, disp.layout.bottom);
+  paint_region(disp.leds, disp.layout.top, color);
+  paint_region(disp.leds, disp.layout.center, color);
+  paint_region(disp.leds, disp.layout.bottom, color);
 }
 
-void draw9(const struct DigitDisplay &disp) {
-  paintRight(disp);
+void draw9(const struct DigitDisplay &disp, CRGB &color) {
+  paintRight(disp, color);
 
-  paint_region(disp.leds, disp.layout.leftTop);
-  paint_region(disp.leds, disp.layout.top);
-  paint_region(disp.leds, disp.layout.center);
+  paint_region(disp.leds, disp.layout.leftTop, color);
+  paint_region(disp.leds, disp.layout.top, color);
+  paint_region(disp.leds, disp.layout.center, color);
 }
 
-void draw0(const struct DigitDisplay &disp) {
-  paintRight(disp);
-  paintLeft(disp);
-  paint_region(disp.leds, disp.layout.top);
-  paint_region(disp.leds, disp.layout.bottom);
+void draw0(const struct DigitDisplay &disp, CRGB &color) {
+  paintRight(disp, color);
+  paintLeft(disp, color);
+  paint_region(disp.leds, disp.layout.top, color);
+  paint_region(disp.leds, disp.layout.bottom, color);
 }
 
-void drawDigit(const struct DigitDisplay &disp, time_t digit) {
+void drawDigit(const struct DigitDisplay &disp, time_t digit, CRGB &color) {
   switch (digit) {
     case 0:
-      draw0(disp);
+      draw0(disp, color);
       break;
     case 1:
-      draw1(disp);
+      draw1(disp, color);
       break;
     case 2:
-      draw2(disp);
+      draw2(disp, color);
       break;
     case 3:
-      draw3(disp);
+      draw3(disp, color);
       break;
     case 4:
-      draw4(disp);
+      draw4(disp, color);
       break;
     case 5:
-      draw5(disp);
+      draw5(disp, color);
       break;
     case 6:
-      draw6(disp);
+      draw6(disp, color);
       break;
     case 7:
-      draw7(disp);
+      draw7(disp, color);
       break;
     case 8:
-      draw8(disp);
+      draw8(disp, color);
       break;
     case 9:
-      draw9(disp);
+      draw9(disp, color);
       break;
     default:
       Serial.println("WTF? Digit wasn't 0-9");
@@ -464,22 +474,22 @@ void fill_label(struct CRGB *labelLeds) {
   fill_solid(labelLeds, NUM_LEDS__LABEL, CRGB::Blue);
 }
 
-//test code for 12:05am Tues Dec 19 2024
-/* struct tm election_date = {
+//test code for 4:08pm Thurs Jan 11 2024
+/*  struct tm election_date = {
   0,
-  5,
-  0,
-  19,
+  14,
+  16,
   11,
-  123,
-  2,
-  352,
+  0,
+  124,
+  4,
+  20,
   0
 }; */
 
 // End date/time: 8pm November 5 2024
 // See: http://www.cplusplus.com/reference/ctime/tm/
- struct tm election_date = {
+  struct tm election_date = {
   0,
   0,
   20,
@@ -513,46 +523,86 @@ void loop() {
 //  ledsMinsLabel[highlightPosition] = CRGB::White;
 //  ledsMinsLabel[highlightPosition * 2] = CRGB::White;
 
-  struct tm now;
-  if (!getLocalTime(&now)) {
-    Serial.println("Failed to obtain time");
-    return;
+
+    unsigned long daysDiff;
+    uint8_t hoursOnly;
+    uint8_t minsOnly;
+    uint8_t secsOnly;
+
+  if (!countdownEnded) {
+        struct tm now;
+    if (!getLocalTime(&now)) {
+      Serial.println("Failed to obtain time");
+      return;
+    }
+
+    if (gLastSec == now.tm_sec) {
+      FastLEDshowESP32();
+      // insert a delay to keep the framerate modest
+      FastLED.delay(1000 / FRAMES_PER_SECOND);
+      return;
+    }
+
+    gLastSec = now.tm_sec;
+
+    time_t seconds = now.tm_sec;
+
+    time_t nowTime = mktime(&now);
+    time_t electionTime = mktime(&election_date);
+
+    double diff = difftime(electionTime, nowTime);
+    daysDiff = (unsigned long)diff / 60 / 60 / 24;
+    hoursOnly = ((unsigned long)(diff) / 60 / 60) % 24;
+    minsOnly = ((unsigned long)(diff) / 60) % 60;
+    secsOnly = (unsigned long)(diff) % 60;
+    sprintf (stringBuffer, "Countdown: %3d days, %2d hours, %2d minutes, and %2d seconds.\r\n", daysDiff, hoursOnly, minsOnly, secsOnly);
+    Serial.println(stringBuffer);
+
+    // switch to displaying all zeros after countdown is complete
+    if (daysDiff == 0 && hoursOnly == 0 && minsOnly == 0 && secsOnly == 0) {
+      countdownEnded = true;
+    }
+  } else {
+    daysDiff = 0;
+    hoursOnly = 0;
+    minsOnly = 0;
+    secsOnly = 0;
+    digitsColor = CRGB(rShift, gShift, bShift);
+    if (goingToBlue) {
+      if (bShift > 254 || rShift < 1) {
+        goingToBlue = false;
+        bShift = 255;
+        rShift = 0;
+        FastLED.delay(1000);
+      } else {
+        bShift += 1;
+        rShift -= 1;
+      }
+    } else {
+      if (bShift < 1 || rShift > 254) {
+        goingToBlue = true;
+        bShift = 0;
+        rShift = 255;
+        FastLED.delay(1000);
+      } else {
+        bShift -= 1;
+        rShift += 1;
+      }
+    }
   }
 
-  if (gLastSec == now.tm_sec) {
-    FastLEDshowESP32();
-    // insert a delay to keep the framerate modest
-    FastLED.delay(1000 / FRAMES_PER_SECOND);
-    return;
-  }
+  drawDigit(days1, daysDiff / 100, digitsColor);
+  drawDigit(days2, daysDiff % 100 / 10, digitsColor);
+  drawDigit(days3, daysDiff % 100 % 10, digitsColor);
 
-  gLastSec = now.tm_sec;
+  drawDigit(hours1, hoursOnly / 10, digitsColor);
+  drawDigit(hours2, hoursOnly % 10, digitsColor);
 
-  time_t seconds = now.tm_sec;
+  drawDigit(mins1, minsOnly / 10, digitsColor);
+  drawDigit(mins2, minsOnly % 10, digitsColor);
 
-  time_t nowTime = mktime(&now);
-  time_t electionTime = mktime(&election_date);
-
-  double diff = difftime(electionTime, nowTime);
-  unsigned long daysDiff = (unsigned long)diff / 60 / 60 / 24;
-  uint8_t hoursOnly = ((unsigned long)(diff) / 60 / 60) % 24;
-  uint8_t minsOnly = ((unsigned long)(diff) / 60) % 60;
-  uint8_t secsOnly = (unsigned long)(diff) % 60;
-  sprintf (stringBuffer, "Countdown: %3d days, %2d hours, %2d minutes, and %2d seconds.\r\n", daysDiff, hoursOnly, minsOnly, secsOnly);
-  Serial.println(stringBuffer);
-
-  drawDigit(days1, daysDiff / 100);
-  drawDigit(days2, daysDiff % 100 / 10);
-  drawDigit(days3, daysDiff % 100 % 10);
-
-  drawDigit(hours1, hoursOnly / 10);
-  drawDigit(hours2, hoursOnly % 10);
-
-  drawDigit(mins1, minsOnly / 10);
-  drawDigit(mins2, minsOnly % 10);
-
-  drawDigit(secs1, secsOnly / 10);
-  drawDigit(secs2, secsOnly % 10);
+  drawDigit(secs1, secsOnly / 10, digitsColor);
+  drawDigit(secs2, secsOnly % 10, digitsColor);
 
   fill_solid(ledsTitle, NUM_LEDS__LARGE, CRGB::Blue);
 
