@@ -174,22 +174,22 @@ struct DigitLayout daysDigit3 = {
 
 struct DigitLayout hoursDigit1 = {
   { 0, 7 },   // top
-  { 48, 58 }, // left top
-  { 40, 49 }, // left bottom
-  { 10, 20 }, // right top
-  { 19, 28 }, // right bottom
-  { 30, 37 }, // bottom
-  { 68, 75 }  // center
+  { 47, 57 }, // left top
+  { 39, 48 }, // left bottom
+  { 9, 19 }, // right top
+  { 18, 27 }, // right bottom
+  { 29, 36 }, // bottom
+  { 67, 74 }  // center
 };
 
 struct DigitLayout hoursDigit2 = {
-  { 96, 103 },  // top
-  { 106, 115 }, // left top
-  { 115, 124 }, // left bottom
-  { 146, 155 }, // right top
-  { 137, 147 }, // right bottom
-  { 127, 134 }, // bottom
-  { 80, 87 }    // center
+  { 87, 94 },  // top
+  { 97, 106 }, // left top
+  { 105, 115 }, // left bottom
+  { 137, 146 }, // right top
+  { 128, 138 }, // right bottom
+  { 118, 125 }, // bottom
+  { 79, 86 }    // center
 };
 
 struct DigitLayout minsDigit1 = {
