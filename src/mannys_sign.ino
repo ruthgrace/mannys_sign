@@ -505,7 +505,7 @@ int gLastSec = 0;
 
 void loop() {
   // We always fade the seconds display since it is changing every second
-  fadeToBlackBy(ledsSeconds, NUM_LEDS__COUNTER, 20);
+  fadeToBlackBy(ledsSeconds, NUM_LEDS__COUNTER, 25);
 
   // When the minute is about to change, fade out all the other counters
   if (gLastSec == 0) {
