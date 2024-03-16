@@ -509,9 +509,9 @@ void loop() {
 
   // When the minute is about to change, fade out all the other counters
   if (gLastSec == 0) {
-    fadeToBlackBy(ledsDays, NUM_LEDS__LARGE, 20);
-    fadeToBlackBy(ledsHours, NUM_LEDS__COUNTER, 20);
-    fadeToBlackBy(ledsMinutes, NUM_LEDS__COUNTER, 20);
+    fadeToBlackBy(ledsDays, NUM_LEDS__LARGE, 25);
+    fadeToBlackBy(ledsHours, NUM_LEDS__COUNTER, 25);
+    fadeToBlackBy(ledsMinutes, NUM_LEDS__COUNTER, 25);
   }
 
   fill_label(ledsMinsLabel);
